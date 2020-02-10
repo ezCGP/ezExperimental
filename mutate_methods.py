@@ -12,6 +12,8 @@ class Mutate_Methods():
 	def mutate_1(indiv: Genome_Material, block_i: int):
 		# do something to indiv
 		# don't need to return indiv...will mutate in place
+		pass
 
 	def mutate_2(indiv: Genome_Material, block_i: int):
 		# do something to indiv
+		pass
