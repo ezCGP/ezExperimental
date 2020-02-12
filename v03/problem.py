@@ -13,22 +13,22 @@ from mate import WholeMateOnly
 from evaluate import PreprocessEvaluate, TensorFlowEvaluate
 from operator import OperatorA
 from argument import ArgumentA
-from meta import MetaA
+from shape import ShapeA
 
 block_def1 = BlockDefinition("preprocessor",
-							MetaA,
-							MutateA,
-							WholeMateOnly,
-							PreprocessEvaluate,
-							OperatorA,
-							ArgumentA)
+							ShapeA(),
+							MutateA(),
+							WholeMateOnly(),
+							PreprocessEvaluate(),
+							OperatorA(),
+							ArgumentA())
 block_def2 = BlockDefinition("tf",
-							MetaA,
-							MutateA,
-							WholeMateOnly,
-							TensorFlowEvaluate,
-							OperatorA,
-							ArgumentA)
+							ShapeA(),
+							MutateA(),
+							WholeMateOnly(),
+							TensorFlowEvaluate(),
+							OperatorA(),
+							ArgumentA())
 
 individual_def = IndividualDefinition([block_def1, block_def2])
 

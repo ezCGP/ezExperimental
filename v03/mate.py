@@ -17,10 +17,12 @@ class MateDefinition(ABC):
 	'''
 	words
 	'''
-	prob_mate = 0.10 # default value
+	def __init__(self,
+				prob_mate = 0.10):
+		self.prob_mate = prob_mate
 
 	@abstractmethod
-	def mate(parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
+	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
 		pass
 
 
@@ -31,6 +33,18 @@ class WholeMateOnly(MateDefinition):
 
 	if they mate, they will only mate with whole_block()
 	'''
-	prob_mate = 0.25
-	def mate(parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
+	def __init__(self):
+		prob_mate = 0.25
+		MateDefinition.__init__(self, prob_mate)
+
+	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
 		mate_methods.whole_block(parent1, parent2, block_index)
+
+
+class NoMate(MateDefinition):
+	def __init__(self):
+		prob_mate = 0
+		MateDefinition.__init__(self, prob_mate)
+
+	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
+		pass

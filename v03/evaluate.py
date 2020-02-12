@@ -18,35 +18,37 @@ class EvaluateDefinition(ABC):
 	'''
 
 	@abstractmethod
-	def evaluate(block: BlockMaterial, training_datapair, validation_datapair=None):
+	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
 
-	def import_list():
+	def import_list(self):
+		'''
+		in theory import packages only if we use the respective EvaluateDefinition
+
+		likely will abandon this
+		'''
 		return []
 
 
 class StandardEvaluate(EvaluateDefinition):
 
-	def evaluate(block: BlockMaterial, training_datapair, validation_datapair=None):
+	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
 
 
 class MPIStandardEvaluate(EvaluateDefinition):
 
-	def evaluate(block: BlockMaterial, training_datapair, validation_datapair=None):
+	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
-
-	def import_list():
-		return ['mpi'] # TODO, how to add this to global?
 
 
 class PreprocessEvaluate(EvaluateDefinition):
 
-	def evaluate(block: BlockMaterial, training_datapair, validation_datapair=None):
+	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
 
 
 class TensorFlowEvaluate(EvaluateDefinition):
 
-	def evaluate(block: BlockMaterial, training_datapair, validation_datapair):
+	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair):
 		pass
