@@ -28,7 +28,7 @@ from argument import ArgumentDefinition
 class BlockDefinition():
 	def __init__(self,
 				nickname: str="default",
-				meta_def: ShapeDefinition,
+				meta_def: ShapeMetaDefinition,
 				mutate_def: MutateDefinition,
 				mate_def: MateDefinition,
 				evaluate_def: EvaluateDefinition,
@@ -44,6 +44,7 @@ class BlockDefinition():
 		# Mutate:
 		self.mutate_def = mutate_def
 		self.prob_mutate = mutate_def.prob_mutate
+		self.num_mutants = mutate_def.num_mutants
 		# Mate:
 		self.mate_def = mate_def
 		self.prob_mate = mate_def.prob_mate
@@ -51,11 +52,15 @@ class BlockDefinition():
 		self.evaluate_def = evaluate_def
 		# Operator:
 		self.operator_def = operator_def
-		self.operDict["input"] = meta_def["input_dtypes"]
-		self.operDict["output"] = meta_def["output_dtypes"]
+		self.operator_dict = operator_def.operator_dict
+		self.operator_dict["input"] = meta_def["input_dtypes"]
+		self.operator_dict["output"] = meta_def["output_dtypes"]
+		self.operators = operator_def.operators
+        self.operator_weights = operator_def.weights
 		# Argument:
 		self.argument_def = argument_def
 		self.arg_count = argument_def.arg_count
+		self.arg_types = argument_def.arg_types
 
 
 	def init_block(self, block: BlockMaterial):
@@ -66,31 +71,194 @@ class BlockDefinition():
 		 * block.need_evaluate
 		'''
 		block.need_evaluate = True
-		block.output = None
-		# args:
-		block.args = [None]*self.arg_count
 		self.fill_args(block)
-		# genome:
-		block.genome = [None]*self.genome_count
-		block.genome[(-1*self.input_count):] = ["InputPlaceholder"]*self.input_count
 		self.fill_genome(block)
+		self.get_actives(block)
+
+	def get_node_dtype(self, node_index: int, key: str):
+		'''
+		key returns that key-value from the respective node_dictionary
+		 * "inputs"
+		 * "args"
+		 * "output"
+		'''
+		if node_index < 0:
+			# input_node
+			return self.input_dtypes[-1*node_index-1]
+		elif node_index >= self.main_count:
+			# output_node
+			return self.output_dtypes[node_index-self.main_count]
+		else:
+			# main_node
+			node_ftn = self[node_index]["ftn"]
+			oper_dict_value = self.operator_dict[node_fnt]
+			return oper_dict_value[key]
+
+	def get_random_input(self, req_dtype, min_=None, max_=None, exclude = []):
+		'''
+		note max_ is exclusive so [min_,max_)
+
+		return None if we failed to find good input
+		'''
+		if min_ is None:
+			min_ = -1*self.input_count
+		if max_ is None:
+			max_ = self.main_count
+		
+		choices = np.arange(min_, max_)
+		for val in exclude:
+			choices = np.delete(choices, np.where(choices==val))
+
+		if len(choices) == 0:
+			# nothing left to choose from
+			return None
+		else:
+			'''
+			exhuastively try each choice to see if we can get datatypes to match
+			'''
+			poss_inputs = np.random.choice(a=choices, size=len(choices), replace=False)
+			for input_index in poss_inputs:
+				input_dtype = self.get_node_type(input_node, "output")
+				if req_dtype == input_dtype:
+					return input_index
+				else:
+					pass
+			# none of the poss_inputs worked, failed to find matching input
+			return None
+
+	def get_random_ftn(self, req_dtype=None, exclude=[], return_all=False):
+		'''
+		words
+		'''
+		choices = np.array(self.operators)
+		weights = np.array(self.operator_weights)
+		
+		for val in exclude:
+			#note: have to delete from weights first because we use choices to get right index
+			weights = np.delete(weights, np.where(choices==val))
+			choices = np.delete(choices, np.where(choices==val))
+		
+		# now check the output dtypes match
+		if req_dtype is not None:
+			delete = []
+			for ith_choice, choice in choices:
+				if self.operator_dict[choice]["output"] != req_dtype:
+					delete.append(ith_choice)
+			weights = np.delete(weights, delete)
+			choices = np.delete(choices, delete)
+
+		if return_all:
+			return rnd.choice(choices, size=len(choices), replace=False, p=weights)
+		else:
+			return rnd.choice(choices, p=weights)
+
+	def get_random_arg(self, req_dtype, exclude=[]):
+		'''
+		words
+		'''
+		choices = []
+		for arg_index, arg_type in enumerate(self.arg_types):
+			if (arg_type == req_dtype) and (arg_index not in exclude):
+				choices.append(arg_index)
+
+		if len(choices) == 0:
+			return None
+		else:
+			return rnd.choice(choices)
 
 	def fill_args(self, block: BlockMaterial):
-		pass
+		block.args = [None]*self.arg_count
+		for arg_index, arg_type in enumerate(self.arg_types):
+			block.args[arg_index] = arg_type()
 
 	def fill_genome(self, block: BlockMaterial):
-		pass
+		block.genome = [None]*self.genome_count
+		block.genome[(-1*self.input_count):] = ["InputPlaceholder"]*self.input_count
+
+		# fill main nodes
+		for node_index in range(self.main_count):
+			ftns = self.get_random_ftn(return_all=True)
+			for ftn in ftns:
+				# find inputs
+				input_dtypes = self.operator_dict[ftn]["inputs"]
+				input_index = [None]*len(input_dtypes)
+				for ith_input, input_dtype in enumerate(input_dtypes):
+					input_index[ith_input] = self.get_random_input(req_dtype=input_dtype, max_=node_index)
+				if None in input_index:
+					# failed to fill it in; try another ftn
+					continue
+				else:
+					pass
+
+				# find args
+				arg_dtypes = self.operator_dict[ftn]["args"]
+				arg_index = [None]*len(arg_dtypes)
+				for ith_arg, arg_dtype in enumerate(arg_dtypes):
+					poss_arg_index = self.get_random_arg(req_dtype=arg_dtype)
+				if None in arg_index:
+					# failed to fill it in; try another ftn
+					continue
+				else:
+					pass
+
+				# all complete
+				block[node_index] = {"ftn": ftn,
+									"inputs": input_index,
+									"args": arg_index}
+				break
+			# error check that node got filled
+			if block[node_index] is None:
+				print("GENOME ERROR: no primitive was able to fit into current genome arrangment")
+				exit()
+
+		# fill output nodes
+		for ith_output, node_index in enumerate(range(self.main_count, self.main_count+self.output_count)):
+			req_dtype = self.output_dtypes[ith_output]
+			block[node_index] = self.get_random_input(req_dtype=req_dtype)
+
+	def get_actives(self, block: BlockMaterial):
+		block.active_nodes = set(np.arange(self.main_count, self.main_count+self.output_count))
+		block.active_args = set()
+		#block.active_ftns = set()
+
+		# add feeds into the output_nodes
+		for node_input in range(self.main_count, self.main_count+self.output_count):
+			block.active_nodes.update([block[node_input]])
+
+		for node_index in reversed(range(self.main_count)):
+			if node_index in block.active_nodes:
+				# then add the input nodes to active list
+				block.active_nodes.update(block[node_index]["inputs"])
+				block.active_args.update(block[node_index]["args"])
+				'''# if we need to check for learners...
+				if (not block.has_learner) and ("learner" in block[node_index]["ftn"].__name__):
+					block.has_learner = True
+				else:
+					pass'''
+			else:
+				pass
+
+		# sort
+		block.active_nodes = sorted(list(block.active_nodes))
+		block.active_args = sorted(list(block.active_args))
+
 
 	def mutate(self, indiv: IndividualMaterial, block_index: int):
 		self.mutate_def.mutate(indiv, block_index)
+		self.get_actives(indiv[block_index])
 
 	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
 		children: List(IndividualMaterial) = self.mate_def.mate(parent1, parent2, block_index)
+		for child in children:
+			self.get_actives(child[block_index])
 		return children
 
 	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
-		output = self.evaluate_def.evaluate(block, training_datapair, validation_datapair)
-		# block.output = output # TODO?
+		self.evaluate_def.reset_evaluation(block)
+		self.evaluate_def.evaluate(block, training_datapair, validation_datapair)
+		output = []
+		for output_index in range(self.main_count, self.main_count+self.output_count):
+			output.append(block.evaluated[output_index])
 		return output
 
 
@@ -105,6 +273,10 @@ class IndividualDefinition():
 		return self.block_defs[i]
 
 
+	def get_actives(self, indiv: IndividualMaterial):
+		for block_index, block in enumerate(indiv.blocks):
+			self[block_index].get_actives(indiv[block_index])
+
 	def mutate(self, indiv: IndividualMaterial):
 		'''
 		right now an individual's block get's mutated with a certain probability
@@ -115,10 +287,11 @@ class IndividualDefinition():
 		for block_index in range(self.block_count):
 			roll = rnd.random()
 			if roll < self[block_index].mutate_def.prob_mutate:
-				mutant = deepcopy(indiv)
-				self[block_index].mutate(mutant, block_index)
-				mutant[block_index].need_evaluate = True # WARNING: assumption here is that mutate will always change an active node
-				mutants.append(mutant)
+				for _ in range(self[block_index].num_mutants):
+					mutant = deepcopy(indiv)
+					self[block_index].mutate(mutant, block_index)
+					mutant[block_index].need_evaluate = True # WARNING: assumption here is that mutate will always change an active node
+					mutants.append(mutant)
 		return mutants
 
 	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial):

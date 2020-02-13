@@ -38,7 +38,7 @@ class WholeMateOnly(MateDefinition):
 		MateDefinition.__init__(self, prob_mate)
 
 	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		mate_methods.whole_block(parent1, parent2, block_index)
+		return mate_methods.whole_block(parent1, parent2, block_index)
 
 
 class NoMate(MateDefinition):
@@ -47,4 +47,4 @@ class NoMate(MateDefinition):
 		MateDefinition.__init__(self, prob_mate)
 
 	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		pass
+		return []

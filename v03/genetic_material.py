@@ -24,7 +24,16 @@ class BlockMaterial():
      * output: TODO maybe have a place to add the output after it has been evaluated
     '''
     def __init__(self, block_def: BlockDefinition):
+        '''
+        sets these attributes:
+         * need_evaluate = False
+         * genome
+         * args
+         * active_nodes
+         * active_args
+        '''
         block_def.init_block(self)
+        block_def.evaluate_def.reset_evaluation(self) # or move...ya prob move to evaluate
 
     def __setitem__(self, node_index, value):
         self.genome[node_index] = value

@@ -28,10 +28,10 @@ class OperatorDefinition():
         '''
         import the operator dict from every module in the list and return
         '''
-        self.operDict = {}
+        self.operator_dict = {}
         for oper_py in modultes:
             _ = __import__(oper_py)
-            self.operDict.update(_.operDict)
+            self.operator_dict.update(_.operDict)
             del _
 
 

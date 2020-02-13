@@ -20,8 +20,10 @@ class MutateDefinition(ABC):
 	whatever class that inherits from MutateDefinition
 	'''
 	def __init__(self,
-				prob_mutate = 0.30)
+				prob_mutate = 0.30,
+				num_mutants = 4)
 		self.prob_mutate = prob_mutate
+		self.num_mutants = num_mutants
 
 	@abstractmethod
 	def mutate(self, indiv: IndividualMaterial, block_index: int):
@@ -56,11 +58,13 @@ class MutateB(MutateDefinition):
 		MutateDefinition.__init__(self, prob_mutate)
 
 
-	def mutate(self, indiv: IndividualMaterial, block_index: int):
+	def mutate(self, indiv: IndividualMaterial, block_index: int, indiv_def: IndividualDefinition):
 		roll = rnd.random()
-		if roll < (1/3):
-			mutate_methods.mutate_single_input(indiv, block_index)
-		elif roll < (2/3):
-			mutate_methods.mutate_single_arg(indiv, block_index)
+		if roll < (1/4):
+			mutate_methods.mutate_single_input(indiv, block_index, indiv_def)
+		elif roll < (2/4):
+			mutate_methods.mutate_single_argvalue(indiv, block_index, indiv_def)
+		elif roll < (3/4):
+			mutate_methods.mutate_single_argindex(indiv, block_index, indiv_def)
 		else:
-			mutate_methods.mutate_single_ftn(indiv, block_index)
+			mutate_methods.mutate_single_ftn(indiv, block_index, indiv_def)

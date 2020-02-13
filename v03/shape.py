@@ -8,7 +8,7 @@ import sys
 
 # scripts
 
-class ShapeDefinition():
+class ShapeMetaDefinition():
 	'''
 	a lot of this is just to help fill attributes of a block
 	like number of nodes, acceptable input/output datatypes, etc
@@ -29,7 +29,7 @@ class ShapeDefinition():
 shape_A = ShapeDefinition([np.float64, np.float64],
 						[np.float64],
 						25)'''
-class ShapeA(ShapeDefinition):
+class ShapeA(ShapeMetaDefinition):
 	def __init__(self):
 		input_dtypes = [np.float64, np.float64]
 		output_dtypes = [np.float64]

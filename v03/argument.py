@@ -21,7 +21,7 @@ class ArgumentDefinition():
 				arg_types: List,
 				arg_weights: List):
 		self.arg_count = arg_count
-		self.arg_types = arg_types
+		self.arg_alltypes = arg_types
 		self.arg_weights = arg_weights
 		self.fill_args()
 
@@ -34,20 +34,23 @@ class ArgumentDefinition():
 
 
 	def fill_args(self):
+		'''
+		note it only fills it by the data type class not instances of the argtype
+		'''
 		start_point = 0
 		end_point = 0
-		self.args = [None]*self.arg_count
-		for arg_type, arg_weights in zip(self.arg_types, self.arg_weights):
+		self.arg_types = [None]*self.arg_count
+		for arg_type, arg_weights in zip(self.arg_alltypes, self.arg_weights):
 			end_point += int(arg_weight*self.arg_count)
 			for arg_index in range(start_point, end_point):
-				self.args[arg_index] = arg_type()
+				self.arg_types[arg_index] = arg_type
 			start_point = end_point
 		if end_point != self.arg_count:
 			# prob some rounding errors then
 			sorted_byweight = np.argsort(self.arg_weights)[::-1] # sort then reverse
 			for i, arg_index in enumerate(range(end_point, self.arg_count)):
-				arg_class = self.arg_types[sorted_byweight[i]]
-				self.args[arg_indx] = arg_class
+				arg_class = self.arg_alltypes[sorted_byweight[i]]
+				self.arg_types[arg_indx] = arg_class
 		else:
 			pass
 

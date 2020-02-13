@@ -21,6 +21,10 @@ class EvaluateDefinition(ABC):
 	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
 
+	@abstractmethod
+	def reset_evaluation(self, block: BlockMaterial):
+		pass
+
 	def import_list(self):
 		'''
 		in theory import packages only if we use the respective EvaluateDefinition
@@ -34,6 +38,12 @@ class StandardEvaluate(EvaluateDefinition):
 
 	def evaluate(self, block: BlockMaterial, training_datapair, validation_datapair=None):
 		pass
+
+	def reset_evaluation(self, block: BlockMaterial):
+		block.evaluated = [None] * len(block.genome)
+		block.output = None
+		block.dead = False
+
 
 
 class MPIStandardEvaluate(EvaluateDefinition):
