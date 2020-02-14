@@ -12,7 +12,7 @@ import os
 import numpy as np
 
 # scripts
-from ... import IndividualDefinition, BlockDefinition
+from genetic_definition import IndividualDefinition, BlockDefinition
 
 
 class BlockMaterial():
@@ -55,7 +55,7 @@ class IndividualMaterial():
     def __init__(self, indiv_def: IndividualDefinition):
         self.fitness = self.Fitness()
         self.blocks = []
-        for block_def in indiv_def.blocks:
+        for block_def in indiv_def.block_defs:
             self.blocks.append(BlockMaterial(block_def))
 
     def __getitem__(self, block_index):

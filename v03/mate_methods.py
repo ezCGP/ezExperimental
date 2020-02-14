@@ -19,51 +19,51 @@ from copy import deepcopy
 
 # scripts
 
-def whole_block(parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-	child1 = deepcopy(parent1)
-	child1[block_index] = deepcopy(parent2[block_index])
+def whole_block(parent1, parent2, block_index: int):
+    child1 = deepcopy(parent1)
+    child1[block_index] = deepcopy(parent2[block_index])
 
-	child2 = deepcopy(parent2)
-	child2[block_index] = deepcopy(parent1[block_index])
+    child2 = deepcopy(parent2)
+    child2[block_index] = deepcopy(parent1[block_index])
 
-	return [child1, child2]
+    return [child1, child2]
 
-def partial_block(parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-	child1 = deepcopy(parent1)
-	child2 = deepcopy(parent2)
-	pass
+def partial_block(parent1, parent2, block_index: int):
+    child1 = deepcopy(parent1)
+    child2 = deepcopy(parent2)
+    pass
 
-	return [child1, child2]
+    return [child1, child2]
 
 
 '''
 See MutateMethods() for my note as to why I removed this
 class MateMethods():
 
-	def __all__(self):
-		'''
-		#gather all callable methods (excluding 'all'), and return
-		'''
-		methods = []
-		for name, val in type(self).__dict__.items():
-			if (callable(val)) and (not 'all'):
-				methods.append(name)
-		return methods
+    def __all__(self):
+
+        #gather all callable methods (excluding 'all'), and return
+
+        methods = []
+        for name, val in type(self).__dict__.items():
+            if (callable(val)) and (not 'all'):
+                methods.append(name)
+        return methods
 
 
-	def whole_block(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		child1 = deepcopy(parent1)
-		child1[block_index] = deepcopy(parent2[block_index])
+    def whole_block(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
+        child1 = deepcopy(parent1)
+        child1[block_index] = deepcopy(parent2[block_index])
 
-		child2 = deepcopy(parent2)
-		child2[block_index] = deepcopy(parent1[block_index])
+        child2 = deepcopy(parent2)
+        child2[block_index] = deepcopy(parent1[block_index])
 
-		return [child1, child2]
+        return [child1, child2]
 
-	def partial_block(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		child1 = deepcopy(parent1)
-		child2 = deepcopy(parent2)
-		pass
+    def partial_block(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
+        child1 = deepcopy(parent1)
+        child2 = deepcopy(parent2)
+        pass
 
-		return [child1, child2]
+        return [child1, child2]
 '''

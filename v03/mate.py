@@ -14,37 +14,37 @@ import mate_methods
 
 
 class MateDefinition(ABC):
-	'''
-	words
-	'''
-	def __init__(self,
-				prob_mate = 0.10):
-		self.prob_mate = prob_mate
+    '''
+    words
+    '''
+    def __init__(self,
+                prob_mate = 0.10):
+        self.prob_mate = prob_mate
 
-	@abstractmethod
-	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		pass
+    @abstractmethod
+    def mate(self, parent1, parent2, block_index: int):
+        pass
 
 
 
 class WholeMateOnly(MateDefinition):
-	'''
-	each pair of block/parents will mate w/prob 25%
+    '''
+    each pair of block/parents will mate w/prob 25%
 
-	if they mate, they will only mate with whole_block()
-	'''
-	def __init__(self):
-		prob_mate = 0.25
-		MateDefinition.__init__(self, prob_mate)
+    if they mate, they will only mate with whole_block()
+    '''
+    def __init__(self):
+        prob_mate = 0.25
+        MateDefinition.__init__(self, prob_mate)
 
-	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		return mate_methods.whole_block(parent1, parent2, block_index)
+    def mate(self, parent1, parent2, block_index: int):
+        return mate_methods.whole_block(parent1, parent2, block_index)
 
 
 class NoMate(MateDefinition):
-	def __init__(self):
-		prob_mate = 0
-		MateDefinition.__init__(self, prob_mate)
+    def __init__(self):
+        prob_mate = 0
+        MateDefinition.__init__(self, prob_mate)
 
-	def mate(self, parent1: IndividualMaterial, parent2: IndividualMaterial, block_index: int):
-		return []
+    def mate(self, parent1, parent2, block_index: int):
+        return []
