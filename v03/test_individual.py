@@ -54,3 +54,8 @@ for j, person in enumerate(muts):
 			print(mnode)
 
 	print("")
+
+print("try mating")
+offspring = individual_def.mate(muts[0],muts[1])
+
+offspring[1][0].genome = muts[0][0].genome 

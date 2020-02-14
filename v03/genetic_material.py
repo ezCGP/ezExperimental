@@ -58,6 +58,9 @@ class IndividualMaterial():
         for block_def in indiv_def.block_defs:
             self.blocks.append(BlockMaterial(block_def))
 
+    def __setitem__(self, block_index, block: BlockMaterial):
+        self.blocks[block_index] = block
+
     def __getitem__(self, block_index):
         return self.blocks[block_index]
 

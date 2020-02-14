@@ -309,7 +309,7 @@ class IndividualDefinition():
         for block_index in range(self.block_count):
             roll = rnd.random()
             if roll < self[block_index].mate_def.prob_mate:
-                children: List() = self.mate_def.mate(parent1, parent2, block_index)
+                children: List() = self[block_index].mate_def.mate(parent1, parent2, block_index)
                 # for each child, we need to set need_evaluate on all nodes from the mated block and on
                 for child in children:
                     for block_i in range(block_index, self.block_count):

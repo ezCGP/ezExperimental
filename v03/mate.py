@@ -34,7 +34,7 @@ class WholeMateOnly(MateDefinition):
     if they mate, they will only mate with whole_block()
     '''
     def __init__(self):
-        prob_mate = 0.25
+        prob_mate = 1.0
         MateDefinition.__init__(self, prob_mate)
 
     def mate(self, parent1, parent2, block_index: int):
