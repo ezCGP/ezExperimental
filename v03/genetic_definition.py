@@ -321,3 +321,5 @@ class IndividualDefinition():
         for block_index, block in enumerate(indiv.blocks):
             if block.need_evaluate:
                 training_datapair = self[block_index].evaluate(block, training_datapair, validation_datapair)
+
+        indiv.output = training_datapair

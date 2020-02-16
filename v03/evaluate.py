@@ -34,6 +34,36 @@ class EvaluateDefinition(ABC):
         return []
 
 
+
+
+class GraphEvaluateDefinition(EvaluateDefinition):
+    '''
+    attempt at abstracting what an EvaluateDefinition will look like for a 
+    computational graph block like tensorflow, pytorch, or keras
+
+    these are just ideas
+    '''
+    @abstractmethod
+    def build_graph(self):
+        pass
+
+    @abstractmethod
+    def reset_graph(self):
+        pass
+
+    @abstractmethod
+    def train_graph(self):
+        pass
+
+    @abstractmethod
+    def run_graph(self):
+        pass
+
+
+
+
+
+
 class StandardEvaluate(EvaluateDefinition):
 
     def evaluate(self, block, training_datapair, validation_datapair=None):
