@@ -31,10 +31,21 @@ class ProblemDefinition(ABC):
      * individual definition
      * which universe
     '''
-
+    # Note to user: all abstract methods are not defined 
+    # by default, please implement according to preferences
     def __init__(self,
-                universe_def,
-                population_def):
+                GEN_LIMIT=100,
+                POP_SIZE = 20
+                N_EPOCHS = 10
+                SEED = 17
+                N_UNIVERSE = 1
+                N_MUTANTS = 2
+                N_OFFSPRING = 2 # THIS COMES IN PAIRS (e.g. N_OFFPSRING = 2 is 4/gen)
+                MIN_SCORE = 0.00  # terminate immediately when 100% accuracy is achieved
+
+                # Logistics Parameters
+                SEED_ROOT_DIR = 'sam_ezCGP_runs/run_20'
+                DATASET_NAME = 'cifar10'
         '''
         self.construct_dataset()
 
@@ -45,13 +56,18 @@ class ProblemDefinition(ABC):
         self.universe_def = universe_def
         self.population_def = population_def
 
-
     @abstractmethod
     def construct_dataset(self):
         '''
         training data + labels
         validating data + labels
         '''
+        print('Train data shape: ' + str(x_train.shape))
+        print('Train labels shape: ' + str(y_train.shape))
+        print('Validation data shape: ' + str(x_val.shape))
+        print('Validation labels shape: ' + str(y_val.shape))
+        print('Test data shape: ' + str(x_test.shape))
+        print('Test labels shape: ' + str(y_test.shape))
         pass
 
 
@@ -60,6 +76,16 @@ class ProblemDefinition(ABC):
         '''
         save fitness for each individual to IndividualMaterial.fitness.values as tuple
         '''
+        try:
+            acc_score = accuracy_score(actual, predict)
+            avg_f1_score = f1_score(actual, predict, average='macro')
+            return 1 - acc_score, 1 - avg_f1_score
+        except ValueError:
+            print('Malformed predictions passed in. Setting worst fitness')
+            return 1, 1  # 0 acc_score and avg f1_score b/c we want this indiv ignored
+
+
+
         pass
 
 
@@ -80,7 +106,7 @@ class ProblemDefinition(ABC):
         '''
         pass
 
-
+    # Note to user: these last two methods are already defined
     def construct_block(self,
                         nickname: str,
                         shape_def: ShapeMetaDefinition,
@@ -101,3 +127,5 @@ class ProblemDefinition(ABC):
     def construct_individual(self,
                             block_defs: List(BlockDefinition)):
         self.indiv_def = IndividualDefinition(block_defs)
+
+
