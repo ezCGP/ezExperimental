@@ -49,6 +49,7 @@ def mutate_single_input(indiv, block_index: int, block_def):
                 block[node_index]["inputs"][ith_input] = new_input
                 if node_index in block.active_nodes:
                     # active_node finally mutated
+                    block.need_evaluate = True
                     break
                 else:
                     pass
@@ -62,7 +63,9 @@ def mutate_single_input(indiv, block_index: int, block_def):
                 continue
             else:
                 block[node_index] = new_output_index
-                break # active_node finally mutated
+                # active_node finally mutated
+                block.need_evaluate = True
+                break
 
 
 def mutate_single_ftn(indiv, block_index: int, block_def):
@@ -129,6 +132,7 @@ def mutate_single_ftn(indiv, block_index: int, block_def):
         block[node_index]["args"] = new_args
         if node_index in block.active_nodes:
             # active_node finally mutated
+            block.need_evaluate = True
             break
         else:
             pass
@@ -163,6 +167,7 @@ def mutate_single_argindex(indiv, block_index: int, block_def):
                 block[node_index]["args"][ith_arg] = new_arg
                 if node_index in block.active_nodes:
                     # active_node finally mutated
+                    block.need_evaluate = True
                     break
                 else:
                     pass
@@ -184,6 +189,7 @@ def mutate_single_argvalue(indiv, block_index: int, block_def):
             block.args[arg_index].mutate()
             if arg_index in block.active_args:
                 # active_arg finally mutated
+                block.need_evaluate = True
                 break
             else:
                 pass
