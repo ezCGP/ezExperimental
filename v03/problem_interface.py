@@ -35,17 +35,18 @@ class ProblemDefinition(ABC):
     # by default, please implement according to preferences
     def __init__(self,
                 GEN_LIMIT=100,
-                POP_SIZE = 20
-                N_EPOCHS = 10
-                SEED = 17
-                N_UNIVERSE = 1
-                N_MUTANTS = 2
-                N_OFFSPRING = 2 # THIS COMES IN PAIRS (e.g. N_OFFPSRING = 2 is 4/gen)
-                MIN_SCORE = 0.00  # terminate immediately when 100% accuracy is achieved
-
+                POP_SIZE = 20,
+                N_EPOCHS = 10,
+                SEED = 17,
+                N_UNIVERSE = 1,
+                N_MUTANTS = 2,
+                N_OFFSPRING = 2, # THIS COMES IN PAIRS (e.g. N_OFFPSRING = 2 is 4/gen)
+                MIN_SCORE = 0.00,  # terminate immediately when 100% accuracy is achieved
                 # Logistics Parameters
-                SEED_ROOT_DIR = 'sam_ezCGP_runs/run_20'
-                DATASET_NAME = 'cifar10'
+                SEED_ROOT_DIR = 'sam_ezCGP_runs/run_20',
+                DATASET_NAME = 'cifar10',
+                # rodd add
+                FactoryDefinition):
         '''
         self.construct_dataset()
 
@@ -55,6 +56,7 @@ class ProblemDefinition(ABC):
         '''
         self.universe_def = universe_def
         self.population_def = population_def
+        self.Factory = FactoryDefinition
 
     @abstractmethod
     def construct_dataset(self):

@@ -8,6 +8,7 @@ import sys
 import numpy as np
 
 # scripts
+from universe import MPIUniverse, Universe
 
 
 if __name__ == "__main__":
@@ -23,8 +24,7 @@ if __name__ == "__main__":
                         help = "pick which seed to use for numpy")
     args = parser.parse_args()
 
-    # set the seed
-    np.random.seed(args.seed)
+
 
     # figure out which problem py file to import
     if args.problem.endswith('.py'):
@@ -32,6 +32,15 @@ if __name__ == "__main__":
     problem_module = __import__(args.problem)
 
     problem = problem_module.Problem()
-    population = problem.build_population() #returns population object
-    universe = problem.universe_def(population)
-    universe.run(population, problem)
+    for ith_universe in problem.number_universe:
+        # set the seed
+        np.random.seed(args.seed + ith_universe)
+
+        # init corresponding universe
+        if problem.mpi:
+            universe = MPIUniverse(problem)
+        else:
+            universe = Universe(problem)
+
+        # run
+        universe.run(population, problem)
