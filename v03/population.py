@@ -35,6 +35,9 @@ class PopulationDefinition():
         '''
         self.population += next_generation
 
+    def split_population(self, num_sub_pops):
+        pass
+
 
 class SubPopulationDefinition(PopulationDefinition):
     '''

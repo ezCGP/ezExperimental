@@ -10,27 +10,33 @@ from abc import ABC, abstractmethod
 
 # scripts
 from genetic_material import IndividualMaterial
-import problem
+from problem_interface import ProblemDefinition
+from population import PopulationDefinition
+from typing import List
 
 
 
 
 class Universe():
-    def __init__(self,
-                problem: ProblemDefinition):
+    def __init__(self, problem: ProblemDefinition):
         '''
         TODO:
         should we try and pass off problem-class attributes to universe???
         or just call from problem as we need... ex: problem.indiv_def
         '''
         self.factory = problem.Factory()
+        self.problem = problem
+        self.converged = False
 
 
+    """
+    1. Where tournament Selection from?
+    """
     def parent_selection(self):
-        return = tournamentSelection(self.population.population, k=len(self.population.population))
+        return tournamentSelection(self.population.population, k=len(self.population.population))
 
 
-    def evolve_population(self, problem):
+    def evolve_population(self, problem: ProblemDefinition):
         # MATE
         children = []
         mating_list = self.parent_selection()
@@ -42,8 +48,8 @@ class Universe():
 
         # MUTATE
         mutants = []
-        for individual in population:
-            mutants += prblem.indiv_def.mutate(individual)
+        for individual in self.population:
+            mutants += problem.indiv_def.mutate(individual)
         self.population.add_next_generation(mutants)
 
 
@@ -55,21 +61,22 @@ class Universe():
             # SCORE
             problem.objective_functions(indiv)
 
-
+    """
+    2. Under poulation_selection, where selections from?
+    """
     def population_selection(self):
-        self.population.population, _ = selections.selNSGA2(self.population.population, self..population.pop_size, nd='standard')
+        self.population.population, _ = selections.selNSGA2(self.population.population, self.population.pop_size, nd='standard')
 
 
     def check_convergence(self, problem_def: ProblemDefinition):
         '''
-        will assign self.convergence
+        Should update self.converged
         '''
         problem_def.check_convergence(self)
 
 
 
-    def run(self,
-            problem: ProblemDefinition):
+    def run(self, problem: ProblemDefinition):
         '''
         assumes a population has only been created and not evaluatedscored
         '''
@@ -77,11 +84,43 @@ class Universe():
 
         self.evaluate_score_population(problem)
         while not self.converged:
-            self.evolve_population(population)
+            self.evolve_population(self.population)
             self.evaluate_score_population(problem)
-            self.population_selection(population)
-            self.check_convergence(problem)
+            self.population_selection(self.population)
+            self.converged = self.check_convergence(problem)
 
+class MPIUniverse(Universe):
+    def __init__(self, problem: ProblemDefinition):
+        '''
+        TODO:
+        should we try and pass off problem-class attributes to universe???
+        or just call from problem as we need... ex: problem.indiv_def
+        '''
+        super().__init__(problem)
+
+    def run(self, problem: ProblemDefinition):
+        """
+        1. Split Population into subpopulation such that number of sup-pops == number of CPUs
+        Loop:
+        2. Scatter Sub-population from CPU 0 to each of the cpu
+        3. Evolve Sub-Population on each CPU
+        4. Evaluate Sub-population on each CPU
+        5. Gather all the sub-population to CPU 0 (Master CPU)
+        6. Perform MPI population selection on CPU 0
+            - This produce a new array of sub-population
+        7. Check convergence on CPU 0
+        8. Broadcast Convergence status to all CPUs
+        Repeat Step 2
+        """
+        pass
+
+    def population_selection_mpi(self, sub_pops: List[PopulationDefinition]):
+        """
+        1. Merge sub-pops
+        2. Run pop_selection
+        3. Split into sub-pops
+        """
+        pass
 
 
 
