@@ -51,9 +51,10 @@ class Universe():
         self.fitness_scores = []
         for indiv in self.population.population:
             # EVALUATE
-            problem.indiv_def.evaluate(indiv, problem.dataset)
+            problem.indiv_def.evaluate(indiv, problem.x_train)
             # SCORE
             problem.objective_functions(indiv)
+            self.fitness_scores.append(indiv.fintess.values)
 
 
     def population_selection(self):
@@ -74,9 +75,10 @@ class Universe():
         assumes a population has only been created and not evaluatedscored
         '''
         self.population = self.factory.build_population(problem.indiv_def, problem.pop_size)
-
+        self.generation = 0
         self.evaluate_score_population(problem)
         while not self.converged:
+            self.generation += 1
             self.evolve_population(population)
             self.evaluate_score_population(problem)
             self.population_selection(population)

@@ -55,24 +55,19 @@ class InidividualMutateA(MutateDefinition):
 
 
 class BlockMutateA(MutateDefinition):
-    '''
-    each block has a prob of mutate at 10%
 
-    then if we choose to mutate that block,
-    it will use muatate_1 25% of the time and
-    mutate_2 75% of the time
-    '''
     def __init__(self):
-        self.prob_mutate = 0.10
+        self.prob_mutate = 1.0
         self.num_mutants = 4
 
-
-    def mutate(self, indiv, block_index: int):
+    def mutate(self, indiv, block_index: int, block_def):
         roll = rnd.random()
-        if roll < 0.25:
-            mutate_methods.mutate_1(indiv, block_index)
+        if roll < (1/2):
+            print("SINGLE INPUT")
+            mutate_methods.mutate_single_input(indiv, block_index, block_def)
         else:
-            mutate_methods.mutate_2(indiv, block_index)
+            print("SINGLE FTN")
+            mutate_methods.mutate_single_ftn(indiv, block_index, block_def)
 
 
 class BlockMutateB(MutateDefinition):
