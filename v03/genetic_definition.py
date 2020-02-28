@@ -259,20 +259,22 @@ class BlockDefinition():
         return children
 
     def evaluate(self, block, training_datapair, validation_datapair=None):
-        self.evaluate_def.reset_evaluation(block)
-        self.evaluate_def.evaluate(block, training_datapair, validation_datapair)
-        output = []
-        for output_index in range(self.main_count, self.main_count+self.output_count):
-            output.append(block.evaluated[output_index])
+        output = self.evaluate_def.evaluate(block, training_datapair, validation_datapair)
         return output
 
 
 
 class IndividualDefinition():
     def __init__(self,
-                block_defs: List[BlockDefinition]):
+                block_defs: List[BlockDefinition],
+                mutate_def: MutateDefinition,
+                mate_def: MateDefinition,
+                evaluate_def: EvaluateDefinition):
         self.block_defs = block_defs
         self.block_count = len(block_defs)
+        self.mutate_def = mutate_def
+        self.mate_def = mate_def
+        self.evaluate_def = evaluate_def
 
     def __getitem__(self, block_index: int):
         return self.block_defs[block_index]
@@ -283,43 +285,12 @@ class IndividualDefinition():
             self[block_index].get_actives(indiv[block_index])
 
     def mutate(self, indiv):
-        '''
-        right now an individual's block get's mutated with a certain probability
-
-        each block mutatation builds a new mutant respectively...rather than multiple mutations in 1 mutant
-        '''
-        mutants = []
-        for block_index in range(self.block_count):
-            roll = rnd.random()
-            if roll < self[block_index].mutate_def.prob_mutate:
-                for _ in range(self[block_index].num_mutants):
-                    mutant = deepcopy(indiv)
-                    self[block_index].mutate(mutant, block_index)
-                    mutant[block_index].need_evaluate = True # WARNING: assumption here is that mutate will always change an active node
-                    mutants.append(mutant)
+        mutants = self.mutate_def.mutate(self, indiv)
         return mutants
 
     def mate(self, parent1, parent2):
-        '''
-        right now 2 parents have a block mated with a certain probability
-
-        each mated block builds a new child
-        '''
-        all_children = []
-        for block_index in range(self.block_count):
-            roll = rnd.random()
-            if roll < self[block_index].mate_def.prob_mate:
-                children: List() = self[block_index].mate_def.mate(parent1, parent2, block_index)
-                # for each child, we need to set need_evaluate on all nodes from the mated block and on
-                for child in children:
-                    for block_i in range(block_index, self.block_count):
-                        child[block_i].need_evaluate = True
-                all_children += children #join the lists
+        children = self.mate_def.mate(self, parent1, parent2)
         return all_children
 
     def evaluate(self, indiv, training_datapair, validation_datapair=None):
-        for block_index, block in enumerate(indiv.blocks):
-            if block.need_evaluate:
-                training_datapair = self[block_index].evaluate(block, training_datapair, validation_datapair)
-
-        indiv.output = training_datapair
+        self.evaluate_def.evaluate(self, indiv, training_datapair, validation_datapair)

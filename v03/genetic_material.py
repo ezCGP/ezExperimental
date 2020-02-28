@@ -23,7 +23,7 @@ class BlockMaterial():
      * need_evaluate: boolean flag
      * output: TODO maybe have a place to add the output after it has been evaluated
     '''
-    def __init__(self, block_def: BlockDefinition):
+    def __init__(self):
         '''
         sets these attributes:
          * need_evaluate = False
@@ -32,8 +32,7 @@ class BlockMaterial():
          * active_nodes
          * active_args
         '''
-        block_def.init_block(self)
-        block_def.evaluate_def.reset_evaluation(self) # or move...ya prob move to evaluate
+        pass
 
     def __setitem__(self, node_index, value):
         self.genome[node_index] = value
@@ -52,11 +51,9 @@ class IndividualMaterial():
      * need_evalute: checks the respective boolean flag in all blocks
      and returns True if at least any single block is True
     '''
-    def __init__(self, indiv_def: IndividualDefinition):
+    def __init__(self):
         self.fitness = self.Fitness()
         self.blocks = []
-        for block_def in indiv_def.block_defs:
-            self.blocks.append(BlockMaterial(block_def))
 
     def __setitem__(self, block_index, block: BlockMaterial):
         self.blocks[block_index] = block
