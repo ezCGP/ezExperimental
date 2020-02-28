@@ -15,12 +15,15 @@ import simple_numpy
 
 class OperatorDefinition():
     '''
-    words
+    An interface that outlines the data structure that stores operators for a given machine learning task (e.g. primitive neural network layers, functions)
     '''
     def __init__(self,
                 operators: List,
                 weights: List,
                 modules: List):
+        '''
+
+        '''
         self.build_operDict(modules)
         self.operators = operators
         self.weights = weights
