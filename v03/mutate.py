@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from numpy import random as rnd
 
 # scripts
+sys.path.insert(1, "./utilities_gp")
 import mutate_methods
 
 
@@ -41,7 +42,7 @@ class InidividualMutateA(MutateDefinition):
     def __init__(self):
         pass
 
-    def mutate(self, indiv_def, indiv)
+    def mutate(self, indiv_def, indiv):
         mutants = []
         for block_index in range(indiv_def.block_count):
             roll = rnd.random()

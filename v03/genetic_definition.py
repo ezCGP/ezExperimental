@@ -30,38 +30,39 @@ class BlockDefinition():
     def __init__(self,
                 nickname: str,
                 meta_def: ShapeMetaDefinition,
-                mutate_def: MutateDefinition,
-                mate_def: MateDefinition,
-                evaluate_def: EvaluateDefinition,
                 operator_def: OperatorDefinition,
-                argument_def: ArgumentDefinition):
+                argument_def: ArgumentDefinition,
+                evaluate_def: EvaluateDefinition,
+                mutate_def: MutateDefinition,
+                mate_def: MateDefinition):
+
         
         # Meta:
         self.nickname = nickname
-        self.meta_def = meta_def
+        self.meta_def = meta_def()
         for name, val in self.meta_def.__dict__.items():
             # quick way to take all attributes and add to self
             self.__dict__[name] = val
         # Mutate:
-        self.mutate_def = mutate_def
-        self.prob_mutate = mutate_def.prob_mutate
-        self.num_mutants = mutate_def.num_mutants
+        self.mutate_def = mutate_def()
+        self.prob_mutate = self.mutate_def.prob_mutate
+        self.num_mutants = self.mutate_def.num_mutants
         # Mate:
-        self.mate_def = mate_def
-        self.prob_mate = mate_def.prob_mate
+        self.mate_def = mate_def()
+        self.prob_mate = self.mate_def.prob_mate
         # Evaluate:
-        self.evaluate_def = evaluate_def
+        self.evaluate_def = evaluate_def()
         # Operator:
-        self.operator_def = operator_def
-        self.operator_dict = operator_def.operator_dict
-        self.operator_dict["input"] = meta_def.input_dtypes
-        self.operator_dict["output"] = meta_def.output_dtypes
-        self.operators = operator_def.operators
-        self.operator_weights = operator_def.weights
+        self.operator_def = operator_def()
+        self.operator_dict = self.operator_def.operator_dict
+        self.operator_dict["input"] = self.meta_def.input_dtypes
+        self.operator_dict["output"] = self.meta_def.output_dtypes
+        self.operators = self.operator_def.operators
+        self.operator_weights = self.operator_def.weights
         # Argument:
-        self.argument_def = argument_def
-        self.arg_count = argument_def.arg_count
-        self.arg_types = argument_def.arg_types
+        self.argument_def = argument_def()
+        self.arg_count = self.argument_def.arg_count
+        self.arg_types = self.argument_def.arg_types
 
 
     def init_block(self, block):
@@ -249,17 +250,21 @@ class BlockDefinition():
 
 
     def mutate(self, indiv, block_index: int):
+        print("this shouldn't happen - mutate")
         self.mutate_def.mutate(indiv, block_index, self)
         self.get_actives(indiv[block_index])
 
     def mate(self, parent1, parent2, block_index: int):
-        children: List() = self.mate_def.mate(parent1, parent2, block_index)
+        print("this shouldn't happen - mate")
+        #children: List() = self.mate_def.mate(parent1, parent2, block_index)
+        children = self.mate_def.mate(parent1, parent2, block_index)
         for child in children:
             self.get_actives(child[block_index])
         return children
 
-    def evaluate(self, block, training_datapair, validation_datapair=None):
-        output = self.evaluate_def.evaluate(block, training_datapair, validation_datapair)
+    def evaluate(self, block_def, block, training_datapair, validation_datapair=None):
+        print("this shouldn't happen - evaluate")
+        output = self.evaluate_def.evaluate(block_def, block, training_datapair, validation_datapair)
         return output
 
 
@@ -272,9 +277,9 @@ class IndividualDefinition():
                 evaluate_def: EvaluateDefinition):
         self.block_defs = block_defs
         self.block_count = len(block_defs)
-        self.mutate_def = mutate_def
-        self.mate_def = mate_def
-        self.evaluate_def = evaluate_def
+        self.mutate_def = mutate_def()
+        self.mate_def = mate_def()
+        self.evaluate_def = evaluate_def()
 
     def __getitem__(self, block_index: int):
         return self.block_defs[block_index]

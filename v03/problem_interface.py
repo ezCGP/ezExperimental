@@ -5,6 +5,7 @@
 # packages
 from abc import ABC, abstractmethod
 from copy import deepcopy
+from typing import List
 
 
 # scripts
@@ -18,6 +19,8 @@ from mate import MateDefinition
 from genetic_definition import BlockDefinition, IndividualDefinition
 from genetic_material import IndividualMaterial
 
+from factory import Factory
+#from universe import Universe
 
 class ProblemDefinition(ABC):
     '''
@@ -32,7 +35,8 @@ class ProblemDefinition(ABC):
     def __init__(self,
                 population_size,
                 number_universe,
-                factory_def: FactoryDefinition):
+                factory_def: Factory,
+                mpi = False):
         '''
         self.construct_dataset()
 
@@ -42,7 +46,8 @@ class ProblemDefinition(ABC):
         '''
         self.pop_size = population_size
         self.number_universe = number_universe
-        self.factory = factory_def
+        self.Factory = factory_def
+        self.mpi = mpi
 
 
     @abstractmethod
@@ -71,7 +76,7 @@ class ProblemDefinition(ABC):
 
 
     @abstractmethod
-    def check_convergence(self, universe: Universe):
+    def check_convergence(self, universe):
         '''
         whether some threshold for fitness or some max generation count
 
@@ -81,7 +86,7 @@ class ProblemDefinition(ABC):
 
 
     # Note to user: these last two methods are already defined
-    def construct_block(self,
+    def construct_block_def(self,
                         nickname: str,
                         shape_def: ShapeMetaDefinition,
                         operator_def: OperatorDefinition,
@@ -98,8 +103,14 @@ class ProblemDefinition(ABC):
                             mate_def)
 
 
-    def construct_individual(self,
-                            block_defs: List(BlockDefinition)):
-        self.indiv_def = IndividualDefinition(block_defs)
+    def construct_individual_def(self,
+                            block_defs: List, # List(BlockDefinition)
+                            mutate_def: MutateDefinition,
+                            mate_def: MateDefinition,
+                            evaluate_def: EvaluateDefinition):
+        self.indiv_def = IndividualDefinition(block_defs,
+                                            mutate_def,
+                                            mate_def,
+                                            evaluate_def)
 
 
