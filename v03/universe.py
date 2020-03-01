@@ -93,6 +93,7 @@ class Universe():
             self.population_selection(self.population)
             self.converged = self.check_convergence(problem)
 
+# TODO: no input params for run()
 class MPIUniverse(Universe):
     def __init__(self, problem: ProblemDefinition):
         '''
@@ -121,8 +122,8 @@ class MPIUniverse(Universe):
         rank = comm.Get_rank() # this CPU's rank
         print('Start MPI Universe Run')
 
-        seed = problem.SEED
-        np.random.seed()
+        # seed = problem.SEED
+        # np.random.seed()
         
         # DatasetObject pass it into evaluation
         
@@ -135,6 +136,8 @@ class MPIUniverse(Universe):
             
             self.population = comm.scatter(split_population, root=0)
             # evolve and evaluate
+            # TODO: if each core mates within own sub-pop, is that ok compared to mating within the entire population?
+            # TODO: if the implementation of splitting and merging is too complicated, we can consider evolving one whole pop on CPU0 (shouldn't be too expensive)
             self.evolve_population(problem)
             self.evaluate_score_population(problem)
             
