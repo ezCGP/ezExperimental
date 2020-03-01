@@ -102,8 +102,9 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
     Edit notes (Sam): TF 2.0 has a tf.function class that builds computational graphs automatically (is recommended), see operators.py
     '''
 
-    def __init__(self, operator_dict, genome_main_count, genome_output_dtypes):
+    def __init__(self, operator_dict, genome_main_count, genome_output_dtypes, operators, operator_weights):
         super().__init__()
+        self.operators, self.operator_weights = operators, operator_weights
         self.operator_dict, self.genome_main_count, self.genome_output_dtypes = operator_dict, genome_main_count, genome_output_dtypes
 
     def random_ftn(self, req_dtype=None, exclude=[], return_all=False):
@@ -135,6 +136,25 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
             return rnd.choice(choices, size=len(choices), replace=False, p=weights)
         else:
             return rnd.choice(choices, p=weights)
+
+    def get_node_dtype(self, block, node_index: int, key: str):
+        '''
+        key returns that key-value from the respective node_dictionary
+         * "inputs"
+         * "args"
+         * "output"
+        '''
+        if node_index < 0:
+            # input_node
+            return self.input_dtypes[-1 * node_index - 1]
+        elif node_index >= self.main_count:
+            # output_node
+            return self.output_dtypes[node_index - self.main_count]
+        else:
+            # main_node
+            node_ftn = block[node_index]["ftn"]
+            oper_dict_value = self.operator_dict[node_ftn]
+            return oper_dict_value[key]
 
     def random_input(self, block, req_dtype, min_=None, max_=None, exclude=[]):
         '''
