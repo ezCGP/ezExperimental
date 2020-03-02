@@ -40,10 +40,18 @@ class DataSet:
         :param batch_size: mini-batch size
         :return: numpy array of training samples generated from the current training pipeline
         """
+        self.make_generator(batch_size)
+        return next(self.generator)
+
+    def make_generator(self, batch_size):
+        """
+        Makes a keras data_generator from the train pipeline
+        param batch_size: mini-batch size
+        :return None
+        """
         if batch_size != self.batch_size:
             self.generator = self.train_pipeline.keras_generator_from_array(self.x_train.astype(np.uint8),
                                                                             self.y_train, batch_size, scaled=False)
-        return next(self.generator)
 
     def preprocess_train_data(self):
         """

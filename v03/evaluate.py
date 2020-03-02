@@ -1,5 +1,13 @@
 '''
-words
+Class which contains the generic evaluateDefinition interface as well as graphEvaluateDefinitions which use
+the interface.
+
+    evaluateDefinition is based upon the idea that every object is evaluable
+    graphEvaluateDefinition is based upon the idea that there are three steps in graph creation:
+        build_graph,
+        run_graph,
+        reset_graph
+
 '''
 
 # packages
@@ -7,6 +15,7 @@ import sys
 import os
 from abc import ABC, abstractmethod
 import traceback
+import tensorflow as tf
 
 
 # scripts
@@ -60,11 +69,9 @@ class GraphEvaluateDefinition(EvaluateDefinition):
     
     Edit notes (Sam): TF 2.0 has a tf.function class that builds computational graphs automatically (is recommended), see operators.py
     '''
-
-    def evaluate(self, block, training_datapair, validation_datapair=None):
-        self.build_graph()
-        self.train_graph()
-        return self.run_graph()
+    @abstractmethod
+    def evaluate(self):
+        pass
 
     """
     Rodd_layout --conversion steps--> Graph Layout
@@ -143,6 +150,7 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         # Block - MetaData
         self.batch_size = batch_size  # takes the batch_size from the block skeleton
         self.n_epochs = n_epochs  # takes the n_epochs from the block skeleton
+        self.num_classes = num_classes
 
         # Block - Argument List
         # the key is to make sure that every single individual in the population has an a list for self.args where each index/element is the same datatype
@@ -161,6 +169,16 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         """
         self.mut_methods = []
         self.mut_weights = []
+
+    def evaluate(self):
+        self.build_graph()
+        inputshape = self.dataset.x_train[0].shape
+        input_ = tf.layers.Input(inputshape)
+        self.evaluated[-1] = input_
+        self.run_graph()  # populates evaluated. .5 seconds on cpu
+        self.train_graph()
+
+        return self.model.predict(**self.dataset.preprocess_test_data())
 
     def get_node_type(self, node_index, arg_dtype=False, input_dtype=False, output_dtype=False):
         if node_index < 0:
@@ -315,10 +333,22 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
 
     def train_graph(self):
         """
+        Call build graph before this
+
         Same functionality as blocks.py tensorblock_evaluate in original code.
         Code this after build_graph and run_graph.
         """
-        pass
+        input_ = self.evaluated[-1]  # tensorflow layer objects
+        out = self.evaluated[-2]
+
+        num_classes = self.num_classes  # we need to redefine this
+        flat_out = tf.Flatten()(out)
+        logits = tf.Dense(num_classes)(flat_out)
+        model = tf.keras.Model(input_, logits, name="dummy")
+
+        self.dataset.make_generator(self.batch_size)
+        model.fit(self.dataset.generator, epochs = self.n_epochs)
+        self.model = model
 
     """
     How does this work
@@ -345,7 +375,6 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
             try:
                 argnums = [arg.value if type(arg) is not int and type(arg) is not float \
                                else arg for arg in args]  # TODO: fix this maybe?
-
                 self.evaluated[node_index] = function(*inputs, *argnums)
             except Exception as e:
                 self.dead = True
@@ -359,7 +388,7 @@ class IndividualStandardEvaluate(EvaluateDefinition):
     def __init__(self):
         pass
 
-    def evaluate(self, indiv_def, indiv, training_datapair, validation_datapair=None)
+    def evaluate(self, indiv_def, indiv, training_datapair, validation_datapair=None):
         for block_index, block in enumerate(indiv.blocks):
             if block.need_evaluate:
                 training_datapair = indiv_def[block_index].evaluate(block, training_datapair, validation_datapair)
