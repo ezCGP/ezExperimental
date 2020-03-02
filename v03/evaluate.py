@@ -76,19 +76,26 @@ class GraphEvaluateDefinition(EvaluateDefinition):
     """
 
     @abstractmethod
-    def build_graph(self):
+    def build_graph(self): # fill Genome?
+        """
+        This will fill the genome and the arguments. Randomize connections.
+        Original code is in genome.py. FillArgs and
+        """
         pass
 
     @abstractmethod
-    def reset_graph(self):
+    def reset_graph(self): # resetAttrVals
+        """
+        Original code in genome.py's resetEvalAttr function.
+        """
         pass
 
-    @abstractmethod
-    def train_graph(self):
-        pass
 
     @abstractmethod
     def run_graph(self):
+        """Running data through the graph.
+        Original code in calculate_func_from_arg_inputs in blocks.py
+        """
         pass
 
 
@@ -262,6 +269,10 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
     """
 
     def train_graph(self):
+        """
+        Same functionality as blocks.py tensorblock_evaluate in original code.
+        Code this after build_graph and run_graph.
+        """
         pass
 
     """
