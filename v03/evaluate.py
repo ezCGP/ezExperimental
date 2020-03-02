@@ -76,7 +76,7 @@ class GraphEvaluateDefinition(EvaluateDefinition):
     """
 
     @abstractmethod
-    def build_graph(self): # fill Genome?
+    def build_graph(self):  # fill Genome?
         """
         This will fill the genome and the arguments. Randomize connections.
         Original code is in genome.py. FillArgs and
@@ -84,58 +84,13 @@ class GraphEvaluateDefinition(EvaluateDefinition):
         pass
 
     @abstractmethod
-    def reset_graph(self): # resetAttrVals
+    def reset_graph(self):  # resetAttrVals
         """
         Original code in genome.py's resetEvalAttr function.
         """
         pass
 
     def run_graph(self):
-        """Running data through the graph.
-        Original code in calculate_func_from_arg_inputs in blocks.py
-        """
-        for node_index in self.active_nodes:
-            # don't evaluate on input/output nodes so skip over this iteration of the loop
-            if node_index < 0 or node_index >= self.genome_main_count:
-                continue
-            # get function, inputs, ags for evalutation
-            function = self.genome[node_index]["ftn"] 
-            inputs = []
-            val_inputs = []
-            node_input_indices = self.genome[node_index]["inputs"] # idx of inputs
-            for node_input_index in node_input_indices:
-                inputs.append(self.evaluated[node_input_index])
-                val_inputs.append(self.val_evaluated[node_input_index])
-            args = []
-            node_arg_indices = self.genome[node_index]["args"] # idx into self.args for args
-            for node_arg_index in node_arg_indices:
-                args.append(self.args[node_arg_index].value)
-            try:
-                if self.tensorblock_flag:
-                    if self.operator_dict[function]["include_labels"]:
-                        raise(Exception("Tensorflow operators should not include labels"))
-                    # added because the objects themselves were being sent in
-                    argnums = [arg.value if type(arg) is not int and type(arg) is not float \
-                        else arg for arg in args] # TODO: fix this maybe?
-                    with self.graph.as_default():
-                        # building tensorflow graph
-                        self.evaluated[node_index] = function(*inputs, *argnums)
-                else:
-                    if self.apply_to_val:
-                        if self.operator_dict[function]["include_labels"]:
-                            raise(Exception("Should not include labels in apply_to_val function")) #self.dead?
-                        else:
-                            self.val_evaluated[node_index] = function(*val_inputs, *args) #self.labels remains unchanged
-                    if self.operator_dict[function]["include_labels"]:
-                        self.evaluated[node_index], self.labels = function(*inputs, self.labels, *args)
-                    else:
-                        self.evaluated[node_index] = function(*inputs, *args)
-            except Exception as e:
-                self.dead = True
-                print('calculate_func_args_inputs error: ')
-                print(traceback.format_exc())
-                print(e)
-                break
         pass
 
 
@@ -154,20 +109,23 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         self.operators, self.operator_weights = operators, operator_weights
         self.operator_dict, self.genome_main_count, self.genome_output_dtypes = operator_dict, genome_main_count, genome_output_dtypes
 
+        """
+        Genome.py variables
+        """
         # Genome - Argument List
         self.args_count = genome_arg_count
-        self.args = [None]*genome_arg_count
+        self.args = [None] * genome_arg_count
         self.arg_methods = [None]
         self.arg_weights = [None]
 
         # Genome - Ftn List
-        self.genome = [None]*(len(genome_input_dtypes)+genome_main_count+len(genome_output_dtypes))
+        self.genome = [None] * (len(genome_input_dtypes) + genome_main_count + len(genome_output_dtypes))
         self.genome_count = len(self.genome)
 
         # Block - Genome List - Input Nodes
-        self.genome_input_dtypes = genome_input_dtypes # a list of data types. the exact values will be assigned at evaluation step
+        self.genome_input_dtypes = genome_input_dtypes  # a list of data types. the exact values will be assigned at evaluation step
         self.genome_input_count = len(genome_input_dtypes)
-        self.genome[-1*len(genome_input_dtypes):] = ["InputPlaceholder"]*len(genome_input_dtypes)#block_inputs
+        self.genome[-1 * len(genome_input_dtypes):] = ["InputPlaceholder"] * len(genome_input_dtypes)  # block_inputs
 
         # Block - Genome List - Main Nodes
         self.genome_main_count = genome_main_count
@@ -175,17 +133,41 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         self.ftn_weights = [None]
 
         # Block - Genome List - Outputs Nodes
-        self.genome_output_dtypes = genome_output_dtypes # a list of data types. the exact values will be evaluated at evaluation step
+        self.genome_output_dtypes = genome_output_dtypes  # a list of data types. the exact values will be evaluated at evaluation step
         self.genome_output_count = len(genome_output_dtypes)
 
+        """
+        blocks.py variables
+        """
+        # Block - MetaData
+        self.batch_size = batch_size  # takes the batch_size from the block skeleton
+        self.n_epochs = n_epochs  # takes the n_epochs from the block skeleton
+
+        # Block - Argument List
+        # the key is to make sure that every single individual in the population has an a list for self.args where each index/element is the same datatype
+        self.arg_methods = list(setup_dict_arg.keys())
+        self.arg_weights = self.buildWeights('arg_methods', setup_dict_arg)
+
+        # Block - Genome List - Input Nodes
+        #  should already be set by Genome()
+        # Block - Genome List - Main Nodes
+        self.ftn_methods = list(setup_dict_ftn.keys())
+        self.ftn_weights = self.buildWeights('ftn_methods', setup_dict_ftn)
+        self.operator_dict = operator_dict
+
+        """
+        Mutate variables
+        """
+        self.mut_methods = []
+        self.mut_weights = []
 
     def get_node_type(self, node_index, arg_dtype=False, input_dtype=False, output_dtype=False):
         if node_index < 0:
             # then it's a Block Input Node
-            return self.genome_input_dtypes[-1*node_index-1] # -1-->0, -2-->1, -3-->2
+            return self.genome_input_dtypes[-1 * node_index - 1]  # -1-->0, -2-->1, -3-->2
         elif node_index >= self.genome_main_count:
             # then it's a Block Output Node
-            return self.genome_output_dtypes[node_index-self.genome_main_count]
+            return self.genome_output_dtypes[node_index - self.genome_main_count]
         else:
             # then it's a Block Main Node
             pass
@@ -197,16 +179,15 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         ftn_dict = self.operator_dict[ftn]
         if input_dtype:
             # get the required input data types for this function
-            return ftn_dict["inputs"] # will return a list
+            return ftn_dict["inputs"]  # will return a list
         elif output_dtype:
             # get the output data types for this function
-            return ftn_dict["outputs"] # returns a single value, not a list...arity is always 1 for outputs
+            return ftn_dict["outputs"]  # returns a single value, not a list...arity is always 1 for outputs
         elif arg_dtype:
             return ftn_dict["args"]
         else:
             print("ProgrammerError: script writer didn't assign input/output dtype for getNodeType method")
             exit()
-
 
     def random_ftn(self, only_one=False, exclude=None, output_dtype=None):
         choices = self.ftn_methods
@@ -216,47 +197,46 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
             for val in exclude:
                 # value == list doesn't work when the value is a function
                 for c, choice in enumerate(choices):
-                    if val==choice:
+                    if val == choice:
                         delete.append(c)
 
             if len(choices) != 1:
-                #print("Should not call mutate since only one function available. Returning original function")
+                # print("Should not call mutate since only one function available. Returning original function")
 
                 choices = np.delete(choices, delete)
                 weights = np.delete(weights, delete)
-                weights /= weights.sum() # normalize weights
+                weights /= weights.sum()  # normalize weights
         else:
             pass
         if output_dtype is not None:
             # force the selected function to have the output_dtype
             delete = []
             for c, choice in enumerate(choices):
-                if self.operator_dict[choice]["outputs"]!=output_dtype:
+                if self.operator_dict[choice]["outputs"] != output_dtype:
                     delete.append(c)
             choices = np.delete(choices, delete)
             weights = np.delete(weights, delete)
-            weights /= weights.sum() # normalize weights
+            weights /= weights.sum()  # normalize weights
         if only_one:
             return np.random.choice(a=choices, size=1, p=weights)[0]
         else:
             return np.random.choice(a=choices, size=len(self.ftn_methods), replace=False, p=weights)
 
-
     def random_input(self, dtype, min_='default', max_='default', exclude=None):
         # max_ is one above the largest integer to be drawn
         # so if we are randomly finding nodes prior to a given node index, set max_ to that index
-        if min_=='default':
-            min_=-1*self.genome_input_count
-        if max_=='default':
-            max_=self.genome_main_count
+        if min_ == 'default':
+            min_ = -1 * self.genome_input_count
+        if max_ == 'default':
+            max_ = self.genome_main_count
         choices = np.arange(min_, max_)
         if exclude is not None:
             for val in exclude:
-                choices = np.delete(choices, np.where(choices==val))
+                choices = np.delete(choices, np.where(choices == val))
         else:
             pass
         if len(choices) == 0:
-            #nothing to choices from...very rare but very possible
+            # nothing to choices from...very rare but very possible
             return None
         possible_nodes = np.random.choice(a=choices, size=len(choices), replace=False)
         # iterate through each input until we find a datatype that matches dtype
@@ -270,7 +250,6 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         # if we got this far then we didn't find a match
         return None
 
-
     def random_arg(self, dtype, exclude=None):
         # have to assume here that each arg_dtype will have at least two in each self.args...or else when we mutate() we would get same arg
         choices = []
@@ -281,11 +260,11 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
                     continue
                 choices.append(arg_index)
         if len(choices) == 0:
-            print("UserInputError: A ftn was provided without having its required (or invalid) data type in the arguments")
+            print(
+                "UserInputError: A ftn was provided without having its required (or invalid) data type in the arguments")
             exit()
         else:
             return np.random.choice(a=choices, size=1)[0]
-
 
     def build_graph(self):
         genome = []
@@ -345,7 +324,52 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
     """
 
     def run_graph(self):
-        pass
+        """Running data through the graph.
+        Original code in calculate_func_from_arg_inputs in blocks.py
+        """
+        for node_index in self.active_nodes:
+            # don't evaluate on input/output nodes so skip over this iteration of the loop
+            if node_index < 0 or node_index >= self.genome_main_count:
+                continue
+            # get function, inputs, ags for evalutation
+            function = self.genome[node_index]["ftn"]
+            inputs = []
+            val_inputs = []
+            node_input_indices = self.genome[node_index]["inputs"]  # idx of inputs
+            for node_input_index in node_input_indices:
+                inputs.append(self.evaluated[node_input_index])
+                val_inputs.append(self.val_evaluated[node_input_index])
+            args = []
+            node_arg_indices = self.genome[node_index]["args"]  # idx into self.args for args
+            for node_arg_index in node_arg_indices:
+                args.append(self.args[node_arg_index].value)
+            try:
+                if self.tensorblock_flag:
+                    if self.operator_dict[function]["include_labels"]:
+                        raise (Exception("Tensorflow operators should not include labels"))
+                    # added because the objects themselves were being sent in
+                    argnums = [arg.value if type(arg) is not int and type(arg) is not float \
+                                   else arg for arg in args]  # TODO: fix this maybe?
+                    with self.graph.as_default():
+                        # building tensorflow graph
+                        self.evaluated[node_index] = function(*inputs, *argnums)
+                else:
+                    if self.apply_to_val:
+                        if self.operator_dict[function]["include_labels"]:
+                            raise (Exception("Should not include labels in apply_to_val function"))  # self.dead?
+                        else:
+                            self.val_evaluated[node_index] = function(*val_inputs,
+                                                                      *args)  # self.labels remains unchanged
+                    if self.operator_dict[function]["include_labels"]:
+                        self.evaluated[node_index], self.labels = function(*inputs, self.labels, *args)
+                    else:
+                        self.evaluated[node_index] = function(*inputs, *args)
+            except Exception as e:
+                self.dead = True
+                print('calculate_func_args_inputs error: ')
+                print(traceback.format_exc())
+                print(e)
+                break
 
 
 class IndividualStandardEvaluate(EvaluateDefinition):
