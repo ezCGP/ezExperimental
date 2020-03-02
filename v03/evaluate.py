@@ -76,19 +76,66 @@ class GraphEvaluateDefinition(EvaluateDefinition):
     """
 
     @abstractmethod
-    def build_graph(self):
+    def build_graph(self): # fill Genome?
+        """
+        This will fill the genome and the arguments. Randomize connections.
+        Original code is in genome.py. FillArgs and
+        """
         pass
 
     @abstractmethod
-    def reset_graph(self):
+    def reset_graph(self): # resetAttrVals
+        """
+        Original code in genome.py's resetEvalAttr function.
+        """
         pass
 
-    @abstractmethod
-    def train_graph(self):
-        pass
-
-    @abstractmethod
     def run_graph(self):
+        """Running data through the graph.
+        Original code in calculate_func_from_arg_inputs in blocks.py
+        """
+        for node_index in self.active_nodes:
+            # don't evaluate on input/output nodes so skip over this iteration of the loop
+            if node_index < 0 or node_index >= self.genome_main_count:
+                continue
+            # get function, inputs, ags for evalutation
+            function = self.genome[node_index]["ftn"] 
+            inputs = []
+            val_inputs = []
+            node_input_indices = self.genome[node_index]["inputs"] # idx of inputs
+            for node_input_index in node_input_indices:
+                inputs.append(self.evaluated[node_input_index])
+                val_inputs.append(self.val_evaluated[node_input_index])
+            args = []
+            node_arg_indices = self.genome[node_index]["args"] # idx into self.args for args
+            for node_arg_index in node_arg_indices:
+                args.append(self.args[node_arg_index].value)
+            try:
+                if self.tensorblock_flag:
+                    if self.operator_dict[function]["include_labels"]:
+                        raise(Exception("Tensorflow operators should not include labels"))
+                    # added because the objects themselves were being sent in
+                    argnums = [arg.value if type(arg) is not int and type(arg) is not float \
+                        else arg for arg in args] # TODO: fix this maybe?
+                    with self.graph.as_default():
+                        # building tensorflow graph
+                        self.evaluated[node_index] = function(*inputs, *argnums)
+                else:
+                    if self.apply_to_val:
+                        if self.operator_dict[function]["include_labels"]:
+                            raise(Exception("Should not include labels in apply_to_val function")) #self.dead?
+                        else:
+                            self.val_evaluated[node_index] = function(*val_inputs, *args) #self.labels remains unchanged
+                    if self.operator_dict[function]["include_labels"]:
+                        self.evaluated[node_index], self.labels = function(*inputs, self.labels, *args)
+                    else:
+                        self.evaluated[node_index] = function(*inputs, *args)
+            except Exception as e:
+                self.dead = True
+                print('calculate_func_args_inputs error: ')
+                print(traceback.format_exc())
+                print(e)
+                break
         pass
 
 
@@ -287,6 +334,10 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
     """
 
     def train_graph(self):
+        """
+        Same functionality as blocks.py tensorblock_evaluate in original code.
+        Code this after build_graph and run_graph.
+        """
         pass
 
     """
