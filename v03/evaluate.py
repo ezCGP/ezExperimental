@@ -6,6 +6,7 @@ words
 import sys
 import os
 from abc import ABC, abstractmethod
+import traceback
 
 
 # scripts
@@ -334,39 +335,21 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
             # get function, inputs, ags for evalutation
             function = self.genome[node_index]["ftn"]
             inputs = []
-            val_inputs = []
             node_input_indices = self.genome[node_index]["inputs"]  # idx of inputs
             for node_input_index in node_input_indices:
                 inputs.append(self.evaluated[node_input_index])
-                val_inputs.append(self.val_evaluated[node_input_index])
             args = []
             node_arg_indices = self.genome[node_index]["args"]  # idx into self.args for args
             for node_arg_index in node_arg_indices:
                 args.append(self.args[node_arg_index].value)
             try:
-                if self.tensorblock_flag:
-                    if self.operator_dict[function]["include_labels"]:
-                        raise (Exception("Tensorflow operators should not include labels"))
-                    # added because the objects themselves were being sent in
-                    argnums = [arg.value if type(arg) is not int and type(arg) is not float \
-                                   else arg for arg in args]  # TODO: fix this maybe?
-                    with self.graph.as_default():
-                        # building tensorflow graph
-                        self.evaluated[node_index] = function(*inputs, *argnums)
-                else:
-                    if self.apply_to_val:
-                        if self.operator_dict[function]["include_labels"]:
-                            raise (Exception("Should not include labels in apply_to_val function"))  # self.dead?
-                        else:
-                            self.val_evaluated[node_index] = function(*val_inputs,
-                                                                      *args)  # self.labels remains unchanged
-                    if self.operator_dict[function]["include_labels"]:
-                        self.evaluated[node_index], self.labels = function(*inputs, self.labels, *args)
-                    else:
-                        self.evaluated[node_index] = function(*inputs, *args)
+                argnums = [arg.value if type(arg) is not int and type(arg) is not float \
+                               else arg for arg in args]  # TODO: fix this maybe?
+
+                self.evaluated[node_index] = function(*inputs, *argnums)
             except Exception as e:
                 self.dead = True
-                print('calculate_func_args_inputs error: ')
+                print('build graph error')
                 print(traceback.format_exc())
                 print(e)
                 break
