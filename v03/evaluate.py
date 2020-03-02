@@ -107,6 +107,31 @@ class TfGraphEvaluateDefinition(EvaluateDefinition):
         self.operators, self.operator_weights = operators, operator_weights
         self.operator_dict, self.genome_main_count, self.genome_output_dtypes = operator_dict, genome_main_count, genome_output_dtypes
 
+        # Genome - Argument List
+        self.args_count = genome_arg_count
+        self.args = [None]*genome_arg_count
+        self.arg_methods = [None]
+        self.arg_weights = [None]
+
+        # Genome - Ftn List
+        self.genome = [None]*(len(genome_input_dtypes)+genome_main_count+len(genome_output_dtypes))
+        self.genome_count = len(self.genome)
+
+        # Block - Genome List - Input Nodes
+        self.genome_input_dtypes = genome_input_dtypes # a list of data types. the exact values will be assigned at evaluation step
+        self.genome_input_count = len(genome_input_dtypes)
+        self.genome[-1*len(genome_input_dtypes):] = ["InputPlaceholder"]*len(genome_input_dtypes)#block_inputs
+
+        # Block - Genome List - Main Nodes
+        self.genome_main_count = genome_main_count
+        self.ftn_methods = [None]
+        self.ftn_weights = [None]
+
+        # Block - Genome List - Outputs Nodes
+        self.genome_output_dtypes = genome_output_dtypes # a list of data types. the exact values will be evaluated at evaluation step
+        self.genome_output_count = len(genome_output_dtypes)
+
+
     def get_node_type(self, node_index, arg_dtype=False, input_dtype=False, output_dtype=False):
         if node_index < 0:
             # then it's a Block Input Node
