@@ -47,8 +47,8 @@ class Universe():
 
         # MUTATE
         mutants = []
-        for individual in population:
-            mutants += prblem.indiv_def.mutate(individual)
+        for individual in self.population.population:
+            mutants += problem.indiv_def.mutate(individual)
         self.population.add_next_generation(mutants)
 
 
@@ -59,11 +59,11 @@ class Universe():
             problem.indiv_def.evaluate(indiv, problem.x_train)
             # SCORE
             problem.objective_functions(indiv)
-            self.fitness_scores.append(indiv.fintess.values)
+            self.fitness_scores.append(indiv.fitness.values)
 
 
     def population_selection(self):
-        self.population.population, _ = selections.selNSGA2(self.population.population, self.population.pop_size, nd='standard')
+        self.population.population, _ = selNSGA2(self.population.population, self.population.pop_size, nd='standard')
 
 
     def check_convergence(self, problem_def: ProblemDefinition):
@@ -81,11 +81,12 @@ class Universe():
         '''
         self.generation = 0
         self.evaluate_score_population(problem)
+        self.population_selection()
         while not self.converged:
             self.generation += 1
-            self.evolve_population(population)
+            self.evolve_population(problem)
             self.evaluate_score_population(problem)
-            self.population_selection(population)
+            self.population_selection()
             self.check_convergence(problem)
 
 

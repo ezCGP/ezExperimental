@@ -58,6 +58,7 @@ class SymbRegressionNoArgs(OperatorDefinition):
                                     weights,
                                     modules)
 
+
 '''
 class SymbRegressionWithArgs(OperatorDefinition):
 

@@ -250,12 +250,10 @@ class BlockDefinition():
 
 
     def mutate(self, indiv, block_index: int):
-        print("this shouldn't happen - mutate")
         self.mutate_def.mutate(indiv, block_index, self)
         self.get_actives(indiv[block_index])
 
     def mate(self, parent1, parent2, block_index: int):
-        print("this shouldn't happen - mate")
         #children: List() = self.mate_def.mate(parent1, parent2, block_index)
         children = self.mate_def.mate(parent1, parent2, block_index)
         for child in children:
@@ -263,7 +261,13 @@ class BlockDefinition():
         return children
 
     def evaluate(self, block_def, block, training_datapair, validation_datapair=None):
-        print("this shouldn't happen - evaluate")
+        # verify that the input data matches the expected datatypes
+        # TODO make a rule that training_datapair always has to be a list??? would be easiest for code
+        for input_dtype, input_data in zip(block_def.input_dtypes, training_datapair):
+            if input_dtype != type(input_data):
+                print("ERROR: datatypes don't match", type(input_data), input_dtype) # add a proper message here
+                return
+
         output = self.evaluate_def.evaluate(block_def, block, training_datapair, validation_datapair)
         return output
 
@@ -295,7 +299,7 @@ class IndividualDefinition():
 
     def mate(self, parent1, parent2):
         children = self.mate_def.mate(self, parent1, parent2)
-        return all_children
+        return children
 
     def evaluate(self, indiv, training_datapair, validation_datapair=None):
         self.evaluate_def.evaluate(self, indiv, training_datapair, validation_datapair)

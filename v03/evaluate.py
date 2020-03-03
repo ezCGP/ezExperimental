@@ -83,7 +83,6 @@ class IndividualStandardEvaluate(EvaluateDefinition):
                 training_datapair = indiv_def[block_index].evaluate(block_def, block, training_datapair, validation_datapair)
 
         indiv.output = training_datapair #TODO figure this out
-        print(indiv.output)
 
     def reset_evaluation(self):
         pass
@@ -93,6 +92,10 @@ class BlockStandardEvaluate(EvaluateDefinition):
 
     def evaluate(self, block_def, block, training_datapair, validation_datapair=None):
         self.reset_evaluation(block)
+
+        # add input data
+        for i, data_input in enumerate(training_datapair):
+            block.evaluated[-1*(i+1)] = data_input
 
         # go solve
         for node_index in block.active_nodes:
@@ -116,8 +119,8 @@ class BlockStandardEvaluate(EvaluateDefinition):
                 for node_arg_index in node_arg_indices:
                     args.append(block.args[node_arg_index].value)
 
-                print(function, inputs, args)
-                self.evaluated[node_index] = function(*inputs, *args)
+                #print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
                 '''try:
                     self.evaluated[node_index] = function(*inputs, *args)
                 except Exception as e:
@@ -127,8 +130,7 @@ class BlockStandardEvaluate(EvaluateDefinition):
 
         output = []
         for output_index in range(block_def.main_count, block_def.main_count+block_def.output_count):
-            import pdb; pdb.set_trace()
-            output.append(block.evaluated[output_index])
+            output.append(block.evaluated[block.genome[output_index]])
         return output
 
     def reset_evaluation(self, block):

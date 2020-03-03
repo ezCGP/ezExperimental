@@ -57,6 +57,9 @@ class Problem(ProblemDefinition):
     def check_convergence(self, universe):
         GENERATION_LIMIT = 199
         SCORE_MIN = 1e-1
+
+        print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))
+
         if universe.generation >= GENERATION_LIMIT:
             print("TERMINATING...reached generation limit")
             universe.converged = True
