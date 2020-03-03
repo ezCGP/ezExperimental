@@ -179,10 +179,14 @@ def mutate_single_argindex(indiv, block_index: int, block_def):
 def mutate_single_argvalue(indiv, block_index: int, block_def):
     '''
     words
+
+    ???
+    Potential Guess: this function will take an individual and a block index value to
+    indicate which block to mutate its hyperparameters
     '''
     block = indiv[block_index]
     if len(block.active_args) > 0:
-        # then there is something to mutate
+        # if block has arguments, then there is something to mutate
         choices = np.arange(self.args_count)
         choices = rnd.choice(choices, size=len(choices), replace=False) #randomly reorder
         for arg_index in choices:

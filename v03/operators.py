@@ -58,12 +58,9 @@ class SymbRegressionNoArgs(OperatorDefinition):
                                     weights,
                                     modules)
 
-
 '''
 class SymbRegressionWithArgs(OperatorDefinition):
-
     #words
-
     def __init__(self):
         modules = ['simple_numpy']
         weight_dict = {simple_numpy.add_aa2a: 1,

@@ -52,6 +52,8 @@ class GraphEvaluateDefinition(EvaluateDefinition):
     computational graph block like tensorflow, pytorch, or keras
 
     these are just ideas
+    
+    Edit notes (Sam): TF 2.0 has a tf.function class that builds computational graphs automatically (is recommended), see operators.py
     '''
     @abstractmethod
     def build_graph(self):
