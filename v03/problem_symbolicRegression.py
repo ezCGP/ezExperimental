@@ -58,11 +58,12 @@ class Problem(ProblemDefinition):
         GENERATION_LIMIT = 199
         SCORE_MIN = 1e-1
 
-        print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))
+        print(universe.generation, np.min(np.array(universe.fitness_scores)[:,0]))
+        print("")
 
         if universe.generation >= GENERATION_LIMIT:
             print("TERMINATING...reached generation limit")
             universe.converged = True
-        if np.min(np.array(universe.fitness_scores)[0]) < SCORE_MIN:
+        if np.min(np.array(universe.fitness_scores)[:,0]) < SCORE_MIN:
             print("TERMINATING...reached minimum score")
             universe.converged = True

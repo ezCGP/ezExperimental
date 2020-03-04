@@ -82,7 +82,7 @@ class IndividualStandardEvaluate(EvaluateDefinition):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
-                training_datapair = indiv_def[block_index].evaluate(block_def, block, training_datapair, validation_datapair)
+                training_datapair = block_def.evaluate(block, training_datapair, validation_datapair)
 
         indiv.output = training_datapair #TODO figure this out
 

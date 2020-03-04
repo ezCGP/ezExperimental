@@ -70,13 +70,13 @@ class BlockWholeMateOnly(MateDefinition):
     def __init__(self):
         self.prob_mate = 1.0
 
-    def mate(self, parent1, parent2, block_index: int):
-        return mate_methods.whole_block(parent1, parent2, block_index)
+    def mate(self, parent1, parent2, block_index: int, block_def):
+        return mate_methods.whole_block(parent1, parent2, block_index, block_def)
 
 
 class BlockNoMate(MateDefinition):
     def __init__(self):
         self.prob_mate = 0
 
-    def mate(self, parent1, parent2, block_index: int):
+    def mate(self, parent1, parent2, block_index: int, block_def):
         return []
