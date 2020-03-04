@@ -5,10 +5,12 @@ words
 # packages
 import os
 import sys
+from copy import deepcopy
 from abc import ABC, abstractmethod
 from numpy import random as rnd
 
 # scripts
+sys.path.insert(1, "./utilities_gp")
 import mutate_methods
 
 
@@ -41,7 +43,7 @@ class InidividualMutateA(MutateDefinition):
     def __init__(self):
         pass
 
-    def mutate(self, indiv_def, indiv)
+    def mutate(self, indiv_def, indiv):
         mutants = []
         for block_index in range(indiv_def.block_count):
             roll = rnd.random()
@@ -63,10 +65,10 @@ class BlockMutateA(MutateDefinition):
     def mutate(self, indiv, block_index: int, block_def):
         roll = rnd.random()
         if roll < (1/2):
-            print("SINGLE INPUT")
+            #print("SINGLE INPUT")
             mutate_methods.mutate_single_input(indiv, block_index, block_def)
         else:
-            print("SINGLE FTN")
+            #print("SINGLE FTN")
             mutate_methods.mutate_single_ftn(indiv, block_index, block_def)
 
 
@@ -80,14 +82,14 @@ class BlockMutateB(MutateDefinition):
     def mutate(self, indiv, block_index: int, block_def):
         roll = rnd.random()
         if roll < (1/4):
-            print("SINGLE INPUT")
+            #print("SINGLE INPUT")
             mutate_methods.mutate_single_input(indiv, block_index, block_def)
         elif roll < (2/4):
-            print("SINGLE ARG VALUE")
+            #print("SINGLE ARG VALUE")
             mutate_methods.mutate_single_argvalue(indiv, block_index, block_def)
         elif roll < (3/4):
-            print("SINGLE ARG INDEX")
+            #print("SINGLE ARG INDEX")
             mutate_methods.mutate_single_argindex(indiv, block_index, block_def)
         else:
-            print("SINGLE FTN")
+            #print("SINGLE FTN")
             mutate_methods.mutate_single_ftn(indiv, block_index, block_def)

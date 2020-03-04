@@ -390,10 +390,14 @@ class IndividualStandardEvaluate(EvaluateDefinition):
 
     def evaluate(self, indiv_def, indiv, training_datapair, validation_datapair=None):
         for block_index, block in enumerate(indiv.blocks):
+            block_def = indiv_def[block_index]
             if block.need_evaluate:
-                training_datapair = indiv_def[block_index].evaluate(block, training_datapair, validation_datapair)
+                training_datapair = indiv_def[block_index].evaluate(block_def, block, training_datapair, validation_datapair)
 
-        indiv.output = training_datapair  # TODO figure this out
+        indiv.output = training_datapair #TODO figure this out
+
+    def reset_evaluation(self):
+        pass
 
 
 class BlockStandardEvaluate(EvaluateDefinition):
@@ -401,11 +405,44 @@ class BlockStandardEvaluate(EvaluateDefinition):
     def evaluate(self, block_def, block, training_datapair, validation_datapair=None):
         self.reset_evaluation(block)
 
+        # add input data
+        for i, data_input in enumerate(training_datapair):
+            block.evaluated[-1*(i+1)] = data_input
+
         # go solve
+        for node_index in block.active_nodes:
+            if node_index < 0:
+                # do nothing. at input node
+                continue
+            elif node_index >= block_def.main_count:
+                # do nothing NOW. at output node. we'll come back to grab output after this loop
+                continue
+            else:
+                # main node. this is where we evaluate
+                function = block[node_index]["ftn"]
+                
+                inputs = []
+                node_input_indices = block[node_index]["inputs"]
+                for node_input_index in node_input_indices:
+                    inputs.append(block.evaluated[node_input_index])
+
+                args = []
+                node_arg_indices = block[node_index]["args"]
+                for node_arg_index in node_arg_indices:
+                    args.append(block.args[node_arg_index].value)
+
+                #print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
+                '''try:
+                    self.evaluated[node_index] = function(*inputs, *args)
+                except Exception as e:
+                    print(e)
+                    self.dead = True
+                    break'''
 
         output = []
-        for output_index in range(block_def.main_count, block_def.main_count + block_def.output_count):
-            output.append(block.evaluated[output_index])
+        for output_index in range(block_def.main_count, block_def.main_count+block_def.output_count):
+            output.append(block.evaluated[block.genome[output_index]])
         return output
 
     def reset_evaluation(self, block):

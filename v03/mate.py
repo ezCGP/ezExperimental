@@ -10,6 +10,7 @@ from numpy import random as rnd
 import numpy as np
 
 # scripts
+sys.path.insert(1, "./utilities_gp")
 import mate_methods
 
 
@@ -50,7 +51,8 @@ class IndividualMateA(MateDefinition):
         for block_index in range(indiv_def.block_count):
             roll = rnd.random()
             if roll < indiv_def[block_index].mate_def.prob_mate:
-                children: List() = indiv_def[block_index].mate_def.mate(parent1, parent2, block_index)
+                #children: List() = indiv_def[block_index].mate_def.mate(parent1, parent2, block_index)
+                children = indiv_def[block_index].mate_def.mate(parent1, parent2, block_index)
                 # for each child, we need to set need_evaluate on all nodes from the mated block and on
                 for child in children:
                     for block_i in range(block_index, indiv_def.block_count):

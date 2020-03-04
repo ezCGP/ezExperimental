@@ -32,7 +32,7 @@ shape_A = ShapeDefinition([np.float64, np.float64],
                         25)'''
 class ShapeA(ShapeMetaDefinition):
     def __init__(self):
-        input_dtypes = [np.ndarray, np.float64]
+        input_dtypes = [np.float64, np.ndarray]
         output_dtypes = [np.ndarray]
         main_count = 25
         ShapeMetaDefinition.__init__(self,
