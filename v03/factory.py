@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from genetic_material import IndividualMaterial, BlockMaterial
 from genetic_definition import IndividualDefinition, BlockDefinition
 from population import PopulationDefinition, SubPopulationDefinition
+from shape import ShapeA, ShapeTensor
 
 
 class Factory():
@@ -49,5 +50,11 @@ class Factory():
         block_def.evaluate_def.reset_evaluation(block) # or move...ya prob move to evaluate TODO
         return block
 
+    def build_shape(self):
+        return ShapeA
 
 
+
+class TensorFactory(Factory):
+    def build_shape(self):
+        return ShapeTensor

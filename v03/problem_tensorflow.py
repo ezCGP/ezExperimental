@@ -3,8 +3,7 @@ import numpy as np
 
 # scripts
 from problem_interface import ProblemDefinition
-from factory import Factory
-from shape import ShapeA
+from factory import Factory, TensorFactory
 from operators import TFOps
 from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
@@ -16,17 +15,18 @@ class Problem(ProblemDefinition):
     def __init__(self):
         population_size = 100
         number_universe = 1
-        factory = Factory
+        factory = TensorFactory
+        factory_instance = factory()
         mpi = False
         super().__init__(population_size, number_universe, factory, mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
-                                            shape_def = ShapeA,
-                                            operator_def =  TFOps,
-                                            argument_def = NoArgs,
-                                            evaluate_def = BlockTensorFlowEvaluate,
-                                            mutate_def = BlockMutateA,
-                                            mate_def = BlockNoMate)
+                                             shape_def = factory_instance.build_shape(),
+                                             operator_def =  TFOps,
+                                             argument_def = NoArgs,
+                                             evaluate_def = BlockTensorFlowEvaluate,
+                                             mutate_def = BlockMutateA,
+                                             mate_def = BlockNoMate)
 
         self.construct_individual_def(block_defs = [block_def],
                                     mutate_def = InidividualMutateA,

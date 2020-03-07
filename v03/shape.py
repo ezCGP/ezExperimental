@@ -32,6 +32,9 @@ shape_A = ShapeDefinition([np.float64, np.float64],
                         [np.float64],
                         25)'''
 class ShapeA(ShapeMetaDefinition):
+    """
+    TODO: ShapeA name should be updated
+    """
     def __init__(self):
         input_dtypes = [np.float64, np.ndarray]  # Should we declare this higher up the chain. Should it be block specific
         output_dtypes = [np.ndarray]
@@ -40,3 +43,16 @@ class ShapeA(ShapeMetaDefinition):
                                 input_dtypes,
                                 output_dtypes,
                                 main_count)
+
+class ShapeTensor(ShapeMetaDefinition):
+    def __init__(self):
+        input_dtypes = [tf.keras.layers]  # Should we declare this higher up the chain. Should it be block specific
+        output_dtypes = [tf.keras.layers]
+        """
+        TODO: Consider where to appropriately placing main_count
+        """
+        main_count = 25
+        ShapeMetaDefinition.__init__(self,
+                                     input_dtypes,
+                                     output_dtypes,
+                                     main_count)

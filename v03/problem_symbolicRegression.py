@@ -4,7 +4,6 @@ import numpy as np
 # scripts
 from problem_interface import ProblemDefinition
 from factory import Factory
-from shape import ShapeA
 from operators import SymbRegressionNoArgs
 from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockStandardEvaluate
@@ -17,11 +16,12 @@ class Problem(ProblemDefinition):
         population_size = 100
         number_universe = 1
         factory = Factory
+        factory_instance = factory()
         mpi = False
         super().__init__(population_size, number_universe, factory, mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
-                                            shape_def = ShapeA,
+                                            shape_def = factory_instance.build_shape(),
                                             operator_def = SymbRegressionNoArgs,
                                             argument_def = NoArgs,
                                             evaluate_def = BlockStandardEvaluate,
