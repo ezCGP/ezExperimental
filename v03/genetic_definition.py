@@ -214,8 +214,7 @@ class BlockDefinition():
                 break
             # error check that node got filled
             if block[node_index] is None:
-                print("GENOME ERROR: no primitive was able to fit into current genome arrangment")
-                exit()
+                raise Exception("GENOME ERROR: no primitive was able to fit into current genome arrangment")
 
         # fill output nodes
         for ith_output, node_index in enumerate(range(self.main_count, self.main_count+self.output_count)):

@@ -6,6 +6,7 @@ this will be the only 'Definition' type that will be instantiated because it is 
 import os
 import sys
 import numpy as np
+import tensorflow as tf
 
 # scripts
 
@@ -32,7 +33,7 @@ shape_A = ShapeDefinition([np.float64, np.float64],
                         25)'''
 class ShapeA(ShapeMetaDefinition):
     def __init__(self):
-        input_dtypes = [np.float64, np.ndarray]
+        input_dtypes = [np.float64, np.ndarray]  # Should we declare this higher up the chain. Should it be block specific
         output_dtypes = [np.ndarray]
         main_count = 25
         ShapeMetaDefinition.__init__(self,

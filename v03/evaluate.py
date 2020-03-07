@@ -463,7 +463,56 @@ class BlockPreprocessEvaluate(EvaluateDefinition):
         pass
 
 
-class BlockTensorFlowEvaluate(EvaluateDefinition):
+class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
-    def evaluate(self, block, training_datapair, validation_datapair):
-        pass
+    def evaluate(self, block_def, block, training_datapair, validation_datapair):
+        self.reset_evaluation(block)
+        num_classes = 10
+
+        # add input data
+        inputshape = self.dataset.x_train[0].shape
+        input_ = tf.layers.Input(inputshape)
+        block.evaluated[-1] = input_
+
+        # go solve
+        for node_index in block.active_nodes:
+            if node_index < 0:
+                # do nothing. at input node
+                continue
+            elif node_index >= block_def.main_count:
+                # do nothing NOW. at output node. we'll come back to grab output after this loop
+                continue
+            else:
+                # main node. this is where we evaluate
+                function = block[node_index]["ftn"]
+
+                inputs = []
+                node_input_indices = block[node_index]["inputs"]
+                for node_input_index in node_input_indices:
+                    inputs.append(block.evaluated[node_input_index])
+
+                args = []
+                node_arg_indices = block[node_index]["args"]
+                for node_arg_index in node_arg_indices:
+                    args.append(block.args[node_arg_index].value)
+
+                # print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
+                '''try:
+                    self.evaluated[node_index] = function(*inputs, *args)
+                except Exception as e:
+                    print(e)
+                    self.dead = True
+                    break'''
+
+        output = block.evaluated[block.genome[block_def.main_count]]
+
+        flat_out = tf.Flatten()(output)
+        logits = tf.Dense(num_classes)(flat_out)
+        model = tf.keras.Model(input_, logits, name="dummy")
+
+        self.dataset.make_generator(self.batch_size)
+        model.fit(self.dataset.generator, epochs = self.n_epochs)
+
+        x_val_norm, _ = self.dataset.preprocess_test_data()
+        return model.predict(x_val_norm)
