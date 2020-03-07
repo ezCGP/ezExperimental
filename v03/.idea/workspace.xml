@@ -4,6 +4,8 @@
     <list default="true" id="fccbf438-5aed-44a7-a668-1b0a416a5384" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/v03.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/v03.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/factory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem_symbolicRegression.py" beforeDir="false" afterPath="$PROJECT_DIR$/problem_symbolicRegression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem_tensorflow.py" beforeDir="false" afterPath="$PROJECT_DIR$/problem_tensorflow.py" afterDir="false" />
@@ -36,6 +38,14 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/main.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="v03" sdk-home="$USER_HOME$/anaconda3/envs/ezCGP/bin/python">
+        <option name="mySdkHome" value="$USER_HOME$/anaconda3/envs/ezCGP/bin/python" />
+        <option name="myModuleName" value="v03" />
+      </console-settings>
+    </option>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
