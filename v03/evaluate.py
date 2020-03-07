@@ -388,11 +388,11 @@ class IndividualStandardEvaluate(EvaluateDefinition):
     def __init__(self):
         pass
 
-    def evaluate(self, indiv_def, indiv, training_datapair, validation_datapair=None):
+    def evaluate(self, indiv_def, indiv, dataset):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
-                training_datapair = indiv_def[block_index].evaluate(block_def, block, training_datapair, validation_datapair)
+                training_datapair = indiv_def[block_index].evaluate(block_def, block, dataset)
 
         indiv.output = training_datapair #TODO figure this out
 
@@ -402,7 +402,8 @@ class IndividualStandardEvaluate(EvaluateDefinition):
 
 class BlockStandardEvaluate(EvaluateDefinition):
 
-    def evaluate(self, block_def, block, training_datapair, validation_datapair=None):
+    def evaluate(self, block_def, block, dataset):
+        training_datapair = dataset.x_train
         self.reset_evaluation(block)
 
         # add input data
@@ -465,12 +466,12 @@ class BlockPreprocessEvaluate(EvaluateDefinition):
 
 class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
-    def evaluate(self, block_def, block, training_datapair, validation_datapair):
+    def evaluate(self, block_def, block, dataset):
         self.reset_evaluation(block)
         num_classes = 10
 
         # add input data
-        inputshape = self.dataset.x_train[0].shape
+        inputshape = dataset.x_train[0].shape
         input_ = tf.layers.Input(inputshape)
         block.evaluated[-1] = input_
 
