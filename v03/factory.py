@@ -1,3 +1,5 @@
+
+
 '''
 factory class will be tasked with building/__init__ all the other classes.
 that way we can wrap other debugging + logging items around the init of each class
