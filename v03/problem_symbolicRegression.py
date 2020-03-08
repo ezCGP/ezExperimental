@@ -9,7 +9,7 @@ from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockStandardEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
-from dataset import DataSet
+from database.dataset import DataSet
 
 
 class Problem(ProblemDefinition):

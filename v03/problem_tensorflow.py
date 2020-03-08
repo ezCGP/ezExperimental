@@ -9,7 +9,14 @@ from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
-from dataset import DataSet
+
+
+from database.db_manager import DbManager
+from database.db_config import DbConfig
+
+# Fitness imports
+from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score as accuracy
 
 class Problem(ProblemDefinition):
     def __init__(self):
@@ -41,19 +48,18 @@ class Problem(ProblemDefinition):
         return 1/data
 
     def construct_dataset(self):
-        self.x_train = [np.float64(1), np.random.uniform(low=0.25, high=2, size=200)]
-        self.y_train = self.goal_function(self.x_train[1])
-        self.x_train = DataSet(self.x_train, self.y_train, [], [])
-        #self.x_test = np.random.uniform(low=0.25, high=2, size=20)
-        #self.y_test = self.goalFunction(self.x_test)
+        db_config = DbConfig()
+        manager = DbManager(db_config)
+        self.dataset = manager.load_CIFAR10()
 
     def objective_functions(self, indiv):
-        actual = self.y_train
-        predit = indiv.output
-        error = actual-predit
-        rms_error = np.sqrt(np.mean(np.square(error)))
-        max_error = np.max(np.abs(error))
-        indiv.fitness.values = (rms_error, max_error)
+        _, actual = self.dataset.preprocess_test_data()
+        actual = np.argmax(actual, axis = 1)
+        predict = indiv.output
+        predict = np.argmax(predict, axis = 1)
+        acc_score = accuracy(actual, predict)
+        f1 = f1_score(actual, predict, average = "macro")
+        indiv.fitness.values = (-acc_score, -f1)  # want to minimize this
 
     def check_convergence(self, universe):
         GENERATION_LIMIT = 199

@@ -263,10 +263,10 @@ class BlockDefinition():
         # verify that the input data matches the expected datatypes
         # TODO make a rule that training_datapair always has to be a list??? would be easiest for code
         training_datapair = dataset.x_train
-        for input_dtype, input_data in zip(block_def.input_dtypes, training_datapair):
-            if input_dtype != type(input_data):
-                print("ERROR: datatypes don't match", type(input_data), input_dtype) # add a proper message here
-                return
+        # for input_dtype, input_data in zip(block_def.input_dtypes, training_datapair):
+        #     if input_dtype != type(input_data):
+        #         print("ERROR: datatypes don't match", type(input_data), input_dtype) # add a proper message here
+        #         return
 
         output = self.evaluate_def.evaluate(block_def, block, dataset)
         return output
