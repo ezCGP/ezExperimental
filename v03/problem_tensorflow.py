@@ -18,6 +18,10 @@ from database.db_config import DbConfig
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score as accuracy
 
+
+# This is a temporary import. We are forcing normalization since we only have one training block
+from augmentation_operators import Normalize
+
 class Problem(ProblemDefinition):
     def __init__(self):
         population_size = 100
@@ -45,14 +49,30 @@ class Problem(ProblemDefinition):
 
 
     def goal_function(self, data):
+        # TODO what is this
         return 1/data
 
     def construct_dataset(self):
+        """
+        Loads cifar 10
+        :return: None
+        """
         db_config = DbConfig()
         manager = DbManager(db_config)
-        self.dataset = manager.load_CIFAR10()
+        dataset = manager.load_CIFAR10()
+
+        # force normalization
+        dataset.train_pipeline.add_operation(Normalize())
+        dataset.test_pipeline.add_operation(Normalize())
+
+        self.dataset = dataset
 
     def objective_functions(self, indiv):
+        """
+
+        :param indiv: individual which contains references to output of training
+        :return: None
+        """
         _, actual = self.dataset.preprocess_test_data()
         actual = np.argmax(actual, axis = 1)
         predict = indiv.output
@@ -62,6 +82,11 @@ class Problem(ProblemDefinition):
         indiv.fitness.values = (-acc_score, -f1)  # want to minimize this
 
     def check_convergence(self, universe):
+        """
+
+        :param universe:
+        :return:
+        """
         GENERATION_LIMIT = 199
         SCORE_MIN = 1e-1
 
