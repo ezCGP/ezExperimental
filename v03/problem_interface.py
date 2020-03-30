@@ -55,6 +55,7 @@ class ProblemDefinition(ABC):
         '''
         training data + labels
         validating data + labels
+        Make sure to assign self.data to the data type of the specific problem
         '''
         pass
 
@@ -62,8 +63,10 @@ class ProblemDefinition(ABC):
     @abstractmethod
     def objective_functions(self, indiv: IndividualMaterial):
         '''
+
         save fitness for each individual to IndividualMaterial.fitness.values as tuple
-        
+        Predictions to evaluate on stored in indiv.output
+
         try:
             acc_score = accuracy_score(actual, predict)
             avg_f1_score = f1_score(actual, predict, average='macro')
@@ -112,5 +115,3 @@ class ProblemDefinition(ABC):
                                             mutate_def,
                                             mate_def,
                                             evaluate_def)
-
-

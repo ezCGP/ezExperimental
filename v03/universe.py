@@ -56,7 +56,7 @@ class Universe():
         self.fitness_scores = []
         for indiv in self.population.population:
             # EVALUATE
-            problem.indiv_def.evaluate(indiv, problem.dataset)  # dataset class?
+            problem.indiv_def.evaluate(indiv, problem.data)  # dataset class?
             # SCORE
             problem.objective_functions(indiv)
             self.fitness_scores.append(indiv.fitness.values)

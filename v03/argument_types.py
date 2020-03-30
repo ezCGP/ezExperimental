@@ -1,4 +1,7 @@
-
+'''
+Where we actually define the specific arguments
+Where we actually define the specific arguments
+'''
 
 # packages
 import numpy as np
@@ -20,7 +23,7 @@ def mut_uniform(value):
     else:
         low = value*.85
         high = value * 1.15
-        return r.uniform(low,high)
+        return np.uniform(low,high)
 
 def mut_normal(value):
     if value == 0:

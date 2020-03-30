@@ -1,5 +1,5 @@
 '''
-words
+Where we specify which datatype to include
 '''
 
 # packages

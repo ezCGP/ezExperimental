@@ -16,7 +16,9 @@ import os
 from abc import ABC, abstractmethod
 import traceback
 import tensorflow as tf
-
+from database.ez_data import ezData
+from database.data_pair import DataPair
+from database.dataset import DataSet
 
 # scripts
 
@@ -107,11 +109,11 @@ class IndividualStandardEvaluate(EvaluateDefinition):
     def __init__(self):
         pass
 
-    def evaluate(self, indiv_def, indiv, dataset):
+    def evaluate(self, indiv_def, indiv, data: ezData):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
-                training_datapair = indiv_def[block_index].evaluate(block_def, block, dataset)
+                training_datapair = indiv_def[block_index].evaluate(block_def, block, data)
 
         indiv.output = training_datapair #TODO figure this out
 
@@ -121,8 +123,8 @@ class IndividualStandardEvaluate(EvaluateDefinition):
 
 class BlockStandardEvaluate(EvaluateDefinition):
 
-    def evaluate(self, block_def, block, dataset):
-        training_datapair = dataset.x_train
+    def evaluate(self, block_def, block, data_pair: DataPair):
+        training_datapair = data_pair.get_data()[0]
         self.reset_evaluation(block)
 
         # add input data
@@ -185,7 +187,7 @@ class BlockPreprocessEvaluate(EvaluateDefinition):
 
 class BlockTensorFlowEvaluate(BlockStandardEvaluate):
     """main -> universe -> individual evaluate -> tensorblock evaluate"""
-    def evaluate(self, block_def, block, dataset):
+    def evaluate(self, block_def, block, dataset: DataSet):
         """
         block_def : specifies specific params of the block.
         block: contains graph structure
@@ -241,13 +243,13 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
         #  construct model from "dummy" input and softmax output
         model = tf.keras.Model(input_, softmax, name="dummy")
-        opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
+        opt = tf.keras.optimizers.Adam(learning_rate=0.001)
         #init = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
         model.compile(loss = "categorical_crossentropy", optimzer = opt)
 
-        #  extract paramaters from dataset object
+        #  extract parameters from dataset object
         batch_size = 256
-        n_epochs = 5  # TODO set variable n_epochs changeable from problem
+        n_epochs = 50  # TODO set variable n_epochs changeable from problem
         model.compile(loss = "categorical_crossentropy", optimzer = opt)
         for i in range(n_epochs):
             batchX, batchY = dataset.next_batch_train(batch_size)

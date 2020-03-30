@@ -5,9 +5,9 @@ This class will be how ezCGP transfers data between blocks.
 
 import Augmentor
 import numpy as np
+from ezData import ezData
 
-
-class DataSet:
+class DataSet(ezData):
 
     def __init__(self, x_train, y_train, x_test, y_test):
         """
@@ -17,6 +17,7 @@ class DataSet:
         :param y_test: testing labels
         """
         super().__init__()
+        self.training_data = DataPair(x_train, y_train)
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test

@@ -24,7 +24,7 @@ from mate import MateDefinition
 from evaluate import EvaluateDefinition
 from operators import OperatorDefinition
 from arguments import ArgumentDefinition
-
+from database.ez_data import ezData
 
 class BlockDefinition():
     def __init__(self,
@@ -259,16 +259,17 @@ class BlockDefinition():
             self.get_actives(child[block_index])
         return children
 
-    def evaluate(self, block_def, block, dataset):
+    def evaluate(self, block_def, block, data: ezData):
         # verify that the input data matches the expected datatypes
         # TODO make a rule that training_datapair always has to be a list??? would be easiest for code
-        training_datapair = dataset.x_train
-        # for input_dtype, input_data in zip(block_def.input_dtypes, training_datapair):
+        training_datapair = data
+        # for input_dtype, input_data in zip(block_def.input_dtypes, training_datapair):  # I don't think type should be enforced here
         #     if input_dtype != type(input_data):
         #         print("ERROR: datatypes don't match", type(input_data), input_dtype) # add a proper message here
         #         return
 
-        output = self.evaluate_def.evaluate(block_def, block, dataset)
+        output = self.evaluate_def.evaluate(block_def, block, data)
+    #    output = block.evaluate(dataset)
         return output
 
 
@@ -301,5 +302,5 @@ class IndividualDefinition():
         children = self.mate_def.mate(self, parent1, parent2)
         return children
 
-    def evaluate(self, indiv, dataset):
-        self.evaluate_def.evaluate(self, indiv, dataset)
+    def evaluate(self, indiv, data: ezData):
+        self.evaluate_def.evaluate(self, indiv, data)

@@ -14,3 +14,4 @@ operDict[activation] = {"inputs": [tf.keras.layers],
                       "output": tf.keras.layers,
                       "args": []
                     }
+

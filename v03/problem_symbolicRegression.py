@@ -9,7 +9,7 @@ from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockStandardEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
-from database.dataset import DataSet
+from database.data_pair import DataPair
 
 
 class Problem(ProblemDefinition):
@@ -44,15 +44,12 @@ class Problem(ProblemDefinition):
     def construct_dataset(self):
         x_train = [np.float64(1), np.random.uniform(low=0.25, high=2, size=200)]
         y_train = self.goal_function(x_train[1])
-        x_test = np.random.uniform(low=0.25, high=2, size=20)
-        y_test = self.goal_function(x_test)
-        self.dataset = DataSet(x_train, y_train, x_test, y_test)
-        # self.x_train = [np.float64(1), np.random.uniform(low=0.25, high=2, size=200)]
-        # self.y_train = self.goal_function(self.x_train[1])
-
+        self.data = DataPair(x_train, y_train)
 
     def objective_functions(self, indiv):
-        actual = self.dataset.y_train
+        x_train, y_train = self.data.get_data()
+        actual = y_train
+
         predit = indiv.output
         error = actual-predit
         rms_error = np.sqrt(np.mean(np.square(error)))

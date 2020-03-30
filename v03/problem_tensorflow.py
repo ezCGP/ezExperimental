@@ -65,7 +65,7 @@ class Problem(ProblemDefinition):
         dataset.train_pipeline.add_operation(Normalize())
         dataset.test_pipeline.add_operation(Normalize())
 
-        self.dataset = dataset
+        self.data = dataset
 
     def objective_functions(self, indiv):
         """
@@ -73,7 +73,8 @@ class Problem(ProblemDefinition):
         :param indiv: individual which contains references to output of training
         :return: None
         """
-        _, actual = self.dataset.preprocess_test_data()
+        dataset = self.data
+        _, actual = dataset.preprocess_test_data()
         actual = np.argmax(actual, axis = 1)
         predict = indiv.output
         predict = np.argmax(predict, axis = 1)

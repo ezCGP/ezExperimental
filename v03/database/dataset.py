@@ -1,6 +1,8 @@
 """
 Created by Michael Jurado and Yuhang Li.
-This class will be how ezCGP transfers data between blocks.
+This class will be how ezCGP transfers data between blocks for image classification problems. Rather than pass
+in all the entire training set into the GraphEvaluate method we can pass in a DataSet which has a batching function.
+The DataSet class also contains an evolve-able training and testing pipeline.
 """
 
 import Augmentor
