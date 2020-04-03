@@ -18,8 +18,8 @@ class Problem(ProblemDefinition):
         number_universe = 1
         factory = Factory
         factory_instance = factory()
-        mpi = False
-        super().__init__(population_size, number_universe, factory, mpi)
+        self.mpi = True
+        super().__init__(population_size, number_universe, factory, self.mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
                                             shape_def = factory_instance.build_shape(),

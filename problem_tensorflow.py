@@ -24,7 +24,7 @@ from augmentation_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 100
+        population_size = 10
         number_universe = 1
         factory = TensorFactory
         factory_instance = factory()
@@ -88,7 +88,7 @@ class Problem(ProblemDefinition):
         :param universe:
         :return:
         """
-        GENERATION_LIMIT = 199
+        GENERATION_LIMIT = 5
         SCORE_MIN = 1e-1
 
         print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))

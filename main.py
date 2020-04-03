@@ -11,33 +11,31 @@ import numpy as np
 # scripts
 from universe import MPIUniverse, Universe
 
-
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--problem",
-                        type = str,
-                        required = True,
-                        help = "pick which problem class to import")
+                        type=str,
+                        required=True,
+                        help="pick which problem class to import")
     parser.add_argument("-s", "--seed",
-                        type = int,
-                        default = 0,
-                        help = "pick which seed to use for numpy")
+                        type=int,
+                        default=0,
+                        help="pick which seed to use for numpy")
     args = parser.parse_args()
-
-
 
     # figure out which problem py file to import
     if args.problem.endswith('.py'):
         args.problem = args.problem[:-3]
     problem_module = __import__(args.problem)
 
-
     output_home = os.path.join(os.getcwd(),
                                "outputs",
                                args.problem,
                                time.strftime("%Y%m%d-%H%M%S"))
-    os.makedirs(output_home, exist_ok=False)
+    if not os.path.exists(output_home):
+        os.makedirs(output_home, exist_ok=True)
 
     problem = problem_module.Problem()
     for ith_universe in range(problem.number_universe):
@@ -54,4 +52,4 @@ if __name__ == "__main__":
         # run
         start_time = time.time()
         universe.run(problem)
-        print("time of universe %i: %02fmin" % (ith_universe, (time.time()-start_time)/60))
+        print("time of universe %i: %02fmin" % (ith_universe, (time.time() - start_time) / 60))

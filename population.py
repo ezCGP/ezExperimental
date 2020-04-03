@@ -35,6 +35,23 @@ class PopulationDefinition():
         '''
         self.population += next_generation
 
+    def split(self, size):
+        new_pop = []
+        for i in range(size):
+            new_pop.append([])
+
+        for i in range(len(self.population)):
+            new_pop[i % size].append(self.population[i])
+        self.population = new_pop
+
+    def merge_pop(self):
+        new_pop = []
+
+        for sub_pop in self.population:
+            for ind in sub_pop:
+                new_pop.append(ind)
+        self.population = new_pop
+
 
 class SubPopulationDefinition(PopulationDefinition):
     '''

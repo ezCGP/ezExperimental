@@ -97,13 +97,13 @@ class Universe():
 
 # TODO: no input params for run()
 class MPIUniverse(Universe):
-    def __init__(self, problem: ProblemDefinition):
+    def __init__(self, problem: ProblemDefinition, output_folder):
         '''
         TODO:
         should we try and pass off problem-class attributes to universe???
         or just call from problem as we need... ex: problem.indiv_def
         '''
-        super().__init__(problem)
+        super().__init__(problem, output_folder)
 
     def run(self, problem: ProblemDefinition):
         """
@@ -130,13 +130,10 @@ class MPIUniverse(Universe):
         # DatasetObject pass it into evaluation
 
         if rank == 0:
-            split_population = self.population.split(size)
-        else:
-            split_population = []
-        converged = False
-        while not converged:
+            self.population.split(size)
 
-            self.population = comm.scatter(split_population, root=0)
+        while not self.converged:
+            self.population.population = comm.scatter(self.population.population, root=0)
             # evolve and evaluate
             # TODO: if each core mates within own sub-pop, is that ok compared to mating within the entire population?
             # TODO: if the implementation of splitting and merging is too complicated, we can consider evolving one whole pop on CPU0 (shouldn't be too expensive)
@@ -144,13 +141,16 @@ class MPIUniverse(Universe):
             self.evaluate_score_population(problem)
 
             comm.Barrier()
-            split_population = comm.gather(self.population, root=0)
+            self.population.population = comm.gather(self.population, root=0)
             if rank == 0:
                 # population_selection should merge a lsit of pop objects, perform selection, split it into an array of pop objects and return that array
-                split_population = self.population_selection()
-                self.check_convergence(problem)
+                self.population.merge_pop()
+                self.population_selection()
+                problem.check_convergence(self)
 
             self.converged = comm.bcast(self.converged, root=0)
+            self.population.split(size)
+
         # check convergence takes care of gen limit too
         # merge self.population array of individuals
         # self.population = util.merge_population(split_population)
