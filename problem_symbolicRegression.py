@@ -14,7 +14,7 @@ from database.data_pair import DataPair
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 100
+        population_size = 16
         number_universe = 1
         factory = Factory
         factory_instance = factory()

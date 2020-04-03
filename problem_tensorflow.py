@@ -24,11 +24,11 @@ from augmentation_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 10
+        population_size = 1000
         number_universe = 1
         factory = TensorFactory
         factory_instance = factory()
-        mpi = False
+        mpi = True
         super().__init__(population_size, number_universe, factory, mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
