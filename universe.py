@@ -130,7 +130,13 @@ class MPIUniverse(Universe):
         # DatasetObject pass it into evaluation
 
         if rank == 0:
+            self.evaluate_score_population(problem)
+            self.population_selection()
             self.population.split(size)
+
+        # self.population = self.factory.build_population(problem.indiv_def, problem.pop_size)
+        print("Gathering")
+        # self.population.population = comm.gather(self.population.population, root=0)
 
         while not self.converged:
             self.population.population = comm.scatter(self.population.population, root=0)
