@@ -88,7 +88,7 @@ class Problem(ProblemDefinition):
         :param universe:
         :return:
         """
-        GENERATION_LIMIT = 5
+        GENERATION_LIMIT = 1
         SCORE_MIN = 1e-1
 
         print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))

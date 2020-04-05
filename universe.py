@@ -43,7 +43,7 @@ class Universe():
     def evolve_population(self, problem):
         # MATE
         children = []
-        mating_list = self.parent_selection()
+        mating_list = self.parent_selection() # produce 4
         for ith_indiv in range(0, len(mating_list), 2):
             parent1 = mating_list[ith_indiv]
             parent2 = mating_list[ith_indiv+1]

@@ -250,7 +250,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
 
             #  extract parameters from dataset object
-            batch_size = 64
+            batch_size = 1
             n_epochs = 1  # TODO set variable n_epochs changeable from problem
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
             for i in range(n_epochs):
@@ -258,4 +258,5 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
                 loss = model.train_on_batch(batchX , batchY)
                 print("epoch %d completed" %i, "loss = ", loss)
             x_val_norm, _ = dataset.preprocess_test_data()
+            self.reset_evaluation(block)  # do this to avoid deepcopy issues in mutate
             return model.predict(x_val_norm)
