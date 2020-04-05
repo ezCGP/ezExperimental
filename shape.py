@@ -18,7 +18,7 @@ class ShapeMetaDefinition():
     def __init__(self,
                 input_dtypes: list=[],
                 output_dtypes: list=[],
-                main_count: int=20):
+                main_count: int=2): # TODO find where to change this
         self.input_dtypes = input_dtypes
         self.input_count = len(input_dtypes)
         self.output_dtypes = output_dtypes

@@ -195,7 +195,8 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
         returns: the predicted labels of the the validation set contained in dataset
         """
-        with tf.device('/GPU:0'):
+      #  with tf.device('/GPU:0'):
+        if 1 == 1:
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
             num_classes = 10
 
@@ -249,8 +250,8 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
 
             #  extract parameters from dataset object
-            batch_size = 256
-            n_epochs = 1000  # TODO set variable n_epochs changeable from problem
+            batch_size = 64
+            n_epochs = 1  # TODO set variable n_epochs changeable from problem
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
             for i in range(n_epochs):
                 batchX, batchY = dataset.next_batch_train(batch_size)
