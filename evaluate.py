@@ -195,8 +195,11 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
         returns: the predicted labels of the the validation set contained in dataset
         """
-        with tf.device('/device:GPU:0'):
-        # if 1 == 1:
+
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
+
+        with tf.device(':'.join(gpus[0].name.split(':')[1:])):
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
             num_classes = 10
 

@@ -60,7 +60,7 @@ class BlockMutateA(MutateDefinition):
 
     def __init__(self):
         self.prob_mutate = 1.0
-        self.num_mutants = 4
+        self.num_mutants = 2
 
     def mutate(self, indiv, block_index: int, block_def):
         roll = rnd.random()

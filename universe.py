@@ -103,6 +103,7 @@ class MPIUniverse(Universe):
         should we try and pass off problem-class attributes to universe???
         or just call from problem as we need... ex: problem.indiv_def
         '''
+        self.generation = 0
         super().__init__(problem, output_folder)
 
     def run(self, problem: ProblemDefinition):
@@ -122,21 +123,17 @@ class MPIUniverse(Universe):
         comm = MPI.COMM_WORLD
         size = comm.Get_size()  # number of CPUs
         rank = comm.Get_rank()  # this CPU's rank
-        print('Start MPI Universe Run')
 
         # seed = problem.SEED
         # np.random.seed()
 
         # DatasetObject pass it into evaluation
 
-        if rank == 0:
-            self.evaluate_score_population(problem)
-            self.population_selection()
-            self.population.split(size)
+        self.population = self.factory.build_population(problem.indiv_def, int(problem.pop_size / size))
+        self.evaluate_score_population(problem)
+        self.population_selection()
 
-        # self.population = self.factory.build_population(problem.indiv_def, problem.pop_size)
-        print("Gathering")
-        # self.population.population = comm.gather(self.population.population, root=0)
+        self.population.population = comm.gather(self.population.population, root=0)
 
         while not self.converged:
             self.population.population = comm.scatter(self.population.population, root=0)
@@ -147,15 +144,15 @@ class MPIUniverse(Universe):
             self.evaluate_score_population(problem)
 
             comm.Barrier()
-            self.population.population = comm.gather(self.population, root=0)
+            self.population.population = comm.gather(self.population.population, root=0)
             if rank == 0:
                 # population_selection should merge a lsit of pop objects, perform selection, split it into an array of pop objects and return that array
                 self.population.merge_pop()
                 self.population_selection()
                 problem.check_convergence(self)
+                self.population.split(size)
 
             self.converged = comm.bcast(self.converged, root=0)
-            self.population.split(size)
 
         # check convergence takes care of gen limit too
         # merge self.population array of individuals

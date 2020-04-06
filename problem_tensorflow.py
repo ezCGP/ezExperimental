@@ -24,7 +24,7 @@ from augmentation_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 16
+        population_size = 8
         number_universe = 1
         factory = TensorFactory
         factory_instance = factory()
