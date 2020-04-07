@@ -18,7 +18,6 @@ from database.db_config import DbConfig
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score as accuracy
 
-
 # This is a temporary import. We are forcing normalization since we only have one training block
 from augmentation_operators import Normalize
 

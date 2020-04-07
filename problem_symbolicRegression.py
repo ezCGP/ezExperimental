@@ -9,7 +9,7 @@ from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockStandardEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
-from database.data_pair import DataPair
+from ezData.data_pair import DataPair
 
 
 class Problem(ProblemDefinition):
@@ -18,7 +18,7 @@ class Problem(ProblemDefinition):
         number_universe = 1
         factory = Factory
         factory_instance = factory()
-        self.mpi = True
+        self.mpi = False
         super().__init__(population_size, number_universe, factory, self.mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
@@ -57,7 +57,7 @@ class Problem(ProblemDefinition):
         indiv.fitness.values = (rms_error, max_error)
 
     def check_convergence(self, universe):
-        GENERATION_LIMIT = 199
+        GENERATION_LIMIT = 10
         SCORE_MIN = 1e-1
 
         print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))

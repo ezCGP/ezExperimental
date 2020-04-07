@@ -24,7 +24,6 @@ from mate import MateDefinition
 from evaluate import EvaluateDefinition
 from operators import OperatorDefinition
 from arguments import ArgumentDefinition
-from database.ez_data import ezData
 
 class BlockDefinition():
     def __init__(self,
@@ -259,7 +258,7 @@ class BlockDefinition():
             self.get_actives(child[block_index])
         return children
 
-    def evaluate(self, block_def, block, data: ezData):
+    def evaluate(self, block_def, block, data):
         # verify that the input data matches the expected datatypes
         # TODO make a rule that training_datapair always has to be a list??? would be easiest for code
         training_datapair = data
@@ -302,5 +301,5 @@ class IndividualDefinition():
         children = self.mate_def.mate(self, parent1, parent2)
         return children
 
-    def evaluate(self, indiv, data: ezData):
+    def evaluate(self, indiv, data):
         self.evaluate_def.evaluate(self, indiv, data)

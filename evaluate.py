@@ -16,9 +16,8 @@ import os
 from abc import ABC, abstractmethod
 import traceback
 import tensorflow as tf
-from database.ez_data import ezData
-from database.data_pair import DataPair
-from database.dataset import DataSet
+from ezData.data_pair import DataPair
+from ezData.dataset import DataSet
 
 # scripts
 
@@ -109,7 +108,7 @@ class IndividualStandardEvaluate(EvaluateDefinition):
     def __init__(self):
         pass
 
-    def evaluate(self, indiv_def, indiv, data: ezData):
+    def evaluate(self, indiv_def, indiv, data):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
@@ -197,9 +196,10 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
         """
 
         gpus = tf.config.experimental.list_physical_devices('GPU')
-        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
+#        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
 
-        with tf.device(':'.join(gpus[0].name.split(':')[1:])):
+ #       with tf.device(':'.join(gpus[0].name.split(':')[1:])):
+        if 1 == 1:
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
             num_classes = 10
 

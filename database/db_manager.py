@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 
 from .db_config import DbConfig
-from .dataset import DataSet
+from ezData.dataset import DataSet
 
 
 class DbManager:
