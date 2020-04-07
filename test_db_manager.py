@@ -2,22 +2,9 @@ import numpy as np
 import Augmentor
 from Augmentor.Operations import Operation
 
-from database.db_manager import DbManager
-from database.db_config import DbConfig
+from database.ezDataLoader import load_CIFAR10
 
 
-db_config = DbConfig()
-manager = DbManager(db_config)
-
-# train, test, val = manager.load_CIFAR10()
-# x_train, y_train = train
-# x_test, y_test = test
-# x_val, y_val = val
-#
-# x_train, y_train = np.array([x_train]), np.array(y_train)  # this is such a weird shape requirement
-# x_test, y_test = np.array([x_test]), np.array([y_test])
-# x_val, y_val = np.array(x_val), np.array(y_val)
-# x_train = x_train[0].astype(np.uint8)
 
 
 # Create your new operation by inheriting from the Operation superclass:
@@ -37,9 +24,7 @@ class Normalize(Operation):
         augmentedImages.append(modImage)
         return augmentedImages
 
-
-dataset = manager.load_CIFAR10()
-
+dataset = load_CIFAR10(.8, .2) # .8 training percent, .2 validation
 dataset.train_pipeline.rotate90(.1)
 dataset.train_pipeline.add_operation(Normalize())
 dataset.test_pipeline.add_operation(Normalize())

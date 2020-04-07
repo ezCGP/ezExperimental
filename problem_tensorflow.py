@@ -10,9 +10,7 @@ from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
 
-
-from database.db_manager import DbManager
-from database.db_config import DbConfig
+from database.ezDataLoader import load_CIFAR10
 
 # Fitness imports
 from sklearn.metrics import f1_score
@@ -56,9 +54,7 @@ class Problem(ProblemDefinition):
         Loads cifar 10
         :return: None
         """
-        db_config = DbConfig()
-        manager = DbManager(db_config)
-        dataset = manager.load_CIFAR10()
+        dataset = load_CIFAR10(.8, .2)
 
         # force normalization
         dataset.train_pipeline.add_operation(Normalize())

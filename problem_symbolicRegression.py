@@ -10,7 +10,7 @@ from evaluate import IndividualStandardEvaluate, BlockStandardEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
 from ezData.data_pair import DataPair
-
+from database.ezDataLoader import load_symbolicRegression
 
 class Problem(ProblemDefinition):
     def __init__(self):
@@ -42,9 +42,7 @@ class Problem(ProblemDefinition):
         return 1/data
 
     def construct_dataset(self):
-        x_train = [np.float64(1), np.random.uniform(low=0.25, high=2, size=200)]
-        y_train = self.goal_function(x_train[1])
-        self.data = DataPair(x_train, y_train)
+        self.data = load_symbolicRegression()
 
     def objective_functions(self, indiv):
         x_train, y_train = self.data.get_data()
