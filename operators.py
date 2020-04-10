@@ -68,7 +68,7 @@ class TFOps(OperatorDefinition):
     def __init__(self):
         modules = ['tensorflow_operator']
         weight_dict = {tensorflow_operator.dense_layer: 1,
-                       tensorflow_operator.activation: 1
+                       #tensorflow_operator.activation: 1
                         } #  TODO fix this. See issue
 
         operators, weights = build_weights(weight_dict)
