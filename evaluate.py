@@ -19,6 +19,7 @@ import tensorflow as tf
 from database.ez_data import ezData
 from database.data_pair import DataPair
 from database.dataset import DataSet
+from mpi4py import MPI
 
 # scripts
 
@@ -195,11 +196,13 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
         returns: the predicted labels of the the validation set contained in dataset
         """
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()  # this CPU's rank
 
         gpus = tf.config.experimental.list_physical_devices('GPU')
-        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
+        tf.config.experimental.set_virtual_device_configuration(gpus[rank % len(gpus)], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
 
-        with tf.device(':'.join(gpus[0].name.split(':')[1:])):
+        with tf.device(':'.join(gpus[rank % len(gpus)].name.split(':')[1:])):
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
             num_classes = 10
 

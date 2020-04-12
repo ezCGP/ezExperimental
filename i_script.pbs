@@ -1,0 +1,10 @@
+# ezCGP pbs script
+#PBS -N test_run
+#PBS -I nodes=1:ppn=4:gpus=1:exclusive_process
+#PBS -I pmem=30gb
+#PBS -I walltime=8:00:00
+#PBS -q pace-ice-gpu
+#PBS -j oe
+#PBS -o test_run.out
+#PBS -m abe
+#PBS -M mpham33@gatech.edu
