@@ -5,6 +5,7 @@ Where we actually define the specific arguments
 
 # packages
 import numpy as np
+import tensorflow as tf
 from numpy import random as r
 from copy import copy
 
@@ -57,6 +58,7 @@ def mut_normal(value):
     The argument skeleton is filled by sampling from this list so even if
     an Arg Class is defined but not added to the list, it will not be used.
     '''
+arguments = []
 
 class argInt():
 
@@ -88,7 +90,7 @@ class argInt():
         else:
             pass
         self.value = int(self.value)
-
+arguments.append(argInt)
 
 class argPow2():
 
@@ -108,3 +110,95 @@ class argPow2():
 
     def __repr__(self):
         return str(self)
+arguments.append(argPow2)
+
+class argFilterSize(object):
+
+    def __init__(self, value=None):
+        if value is None:
+            self.mutate()
+        else:
+            self.value = value
+            self.num_samples = 10
+
+    def mutate(self):
+        sizes = [1, 3, 5, 7]
+        size = r.random_integers(0, 3)
+        self.value = int(sizes[size])
+
+    def __str__(self):
+        return "{}".format(self.value)
+
+    def __repr__(self):
+        return str(self)
+
+
+arguments.append(argFilterSize)
+
+
+# TODO: Implement Pool height and width properly
+class argPoolHeight(object):
+
+    def __init__(self, value=None):
+        if value is None:
+            self.mutate()
+        else:
+            self.value = value
+            self.num_samples = 10
+
+    def mutate(self):
+        # kernel height between 1 and 4
+        self.value = np.random.uniform(1, 4)
+
+    def __str__(self):
+        return "{}".format(self.value)
+
+    def __repr__(self):
+        return str(self)
+
+arguments.append(argPoolHeight)
+
+class argPoolWidth(object):
+
+    def __init__(self, value=None):
+        if value is None:
+            self.mutate()
+        else:
+            self.value = value
+            self.num_samples = 10
+
+    def mutate(self):
+        # kernel width between 1 and 4
+        self.value = np.random.uniform(1, 4)
+
+    def __str__(self):
+        return "{}".format(self.value)
+
+    def __repr__(self):
+        return str(self)
+
+arguments.append(argPoolWidth)
+
+class activation(object):
+
+    def __init__(self, value=None):
+        if value is None:
+            self.mutate()
+        else:
+            self.value = value
+            self.num_samples = 10
+
+    def mutate(self):
+        # kernel width between 1 and 4
+        activationList = [tf.nn.relu, tf.nn.sigmoid,
+                          tf.nn.tanh,
+                          None, tf.nn.elu]
+        self.value = np.random.choice(activationList)
+
+    def __str__(self):
+        return "{}".format(self.value)
+
+    def __repr__(self):
+        return str(self)
+
+arguments.append(activation)
