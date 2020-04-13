@@ -56,9 +56,8 @@ class Problem(ProblemDefinition):
         """
         dataset = load_CIFAR10(.8, .2)
 
-        # force normalization
-        dataset.train_pipeline.add_operation(Normalize())
-        dataset.test_pipeline.add_operation(Normalize())
+        # force normalization  # will now apply to both pipelines
+        dataset.preprocess_pipeline.add_operation(Normalize())
 
         self.data = dataset
 

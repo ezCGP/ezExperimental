@@ -253,7 +253,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
 
             #  extract parameters from dataset object
-            batch_size = 1
+            batch_size = 64
             n_epochs = 1  # TODO set variable n_epochs changeable from problem
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
             for i in range(n_epochs):
