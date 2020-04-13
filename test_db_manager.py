@@ -62,7 +62,7 @@ dataset.preprocess_pipeline.add_operation(Normalize())
 dataset.preprocess_pipeline.add_operation(ResNet())  # trained neural network can be thought of as advanced feature extraction
 
 start = time.time()
-x_batch, y_batch = dataset.next_batch_train(128)  # training data is randomly rotated and normalized. Also uses preprocess_pipeline
+x_batch, y_batch = dataset.next_batch_train(128)  # training data is randomly rotated and skewed. Also uses preprocess_pipeline
 # img = Image.fromarray(x_batch[0], "RGB") # can only view if not gone through ResNet
 # img.show()
 print("X_batch shape", x_batch.shape)
