@@ -66,7 +66,7 @@ x_batch, y_batch = dataset.next_batch_train(128)  # training data is randomly ro
 # img = Image.fromarray(x_batch[0], "RGB") # can only view if not gone through ResNet
 # img.show()
 print("X_batch shape", x_batch.shape)
-x_val_norm, y_val = dataset.preprocess_test_data()  # testing data is just normalized
+x_val_norm, y_val = dataset.preprocess_test_data()  # testing data is just normalized and passed through ResNet
 print("X val norm shape", x_val_norm.shape)
 dataset.clear_data()
 print("Time elapsed", time.time() - start)
