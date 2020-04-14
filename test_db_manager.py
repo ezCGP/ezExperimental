@@ -47,14 +47,14 @@ class ResNet(Operation):
             # specify self.resModel
             self.resModel = ResNet152V2(include_top=False, weights='imagenet',input_tensor=None,
                                 input_shape=images[0].shape)
-        return self.resModel.predict(images)[:, 0, 0, :]
+        return self.resModel.predict(images)
 
 
 dataset = load_CIFAR10(.95, .05) # .8 training percent, .2 validation
 
 #  Data Augmentation
 dataset.augmentation_pipeline.rotate90(.99)  # rotate 99% of images
-dataset.augmentation_pipeline.skew(.5) # shew 50% of images
+dataset.augmentation_pipeline.skew(.5)  # shew 50% of images
 
 
 #  Preprocessing Step

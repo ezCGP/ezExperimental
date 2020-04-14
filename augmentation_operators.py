@@ -39,3 +39,9 @@ class ResNet(Operation):
             self.resModel = ResNet152V2(include_top=False, weights='imagenet',input_tensor=None,
                                 input_shape=images[0].shape)
         return self.resModel.predict(images)[:, 0, 0, :]
+
+"""Example of using Augmentor"""
+
+def rotate(p, probability=.5, max_left_rotation=5, max_right_rotation=10):
+    p.rotate(probability, max_left_rotation, max_right_rotation)
+    return p

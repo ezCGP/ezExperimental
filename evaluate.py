@@ -104,6 +104,22 @@ class GraphEvaluateDefinition(EvaluateDefinition):
 
 
 
+# class IndividualStandardEvaluate(EvaluateDefinition):
+#     def __init__(self):
+#         pass
+#
+#     def evaluate(self, indiv_def, indiv, data):
+#         for block_index, block in enumerate(indiv.blocks):
+#             block_def = indiv_def[block_index]
+#             if block.need_evaluate:
+#                 training_datapair = indiv_def[block_index].evaluate(block_def, block, data)
+#
+#         indiv.output = training_datapair #TODO figure this out
+#
+#     def reset_evaluation(self):
+#         pass
+
+
 class IndividualStandardEvaluate(EvaluateDefinition):
     def __init__(self):
         pass
@@ -112,12 +128,13 @@ class IndividualStandardEvaluate(EvaluateDefinition):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
-                training_datapair = indiv_def[block_index].evaluate(block_def, block, data)
+                data = indiv_def[block_index].evaluate(block_def, block, data)
 
-        indiv.output = training_datapair #TODO figure this out
+        indiv.output = data #TODO figure this out
 
     def reset_evaluation(self):
         pass
+
 
 
 class BlockStandardEvaluate(EvaluateDefinition):
@@ -205,7 +222,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
 
             # add input data
             inputshape = dataset.x_train[0].shape
-            input_ = tf.keras.layers.Input(inputshape)
+            input_ = tf.keras.layers.Input(inputshape)  # dataset.augmentor_pipeline
             block.evaluated[-1] = input_
 
             # go solve
@@ -239,7 +256,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
                         self.dead = True
                         break'''
 
-            output = block.evaluated[block.genome[block_def.main_count]]
+            output = block.evaluated[block.genome[block_def.main_count]]  # modified augmentor
 
             #  flatten the output node and perform a softmax
             flat_out = tf.keras.layers.Flatten()(output)
@@ -263,3 +280,5 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             x_val_norm, _ = dataset.preprocess_test_data()
             self.reset_evaluation(block)  # do this to avoid deepcopy issues in mutate
             return model.predict(x_val_norm)
+
+        #dataset -> augmentationBlock-> return dataset -> preprocessingBlock -> return dataset -> BlockTensorFlowEvaluate -> return outputs of val set
