@@ -195,10 +195,93 @@ class BlockMPIStandardEvaluate(EvaluateDefinition):
         pass
 
 
+class BlockAugmentationEvaluate(EvaluateDefinition):
+
+    def evaluate(self, block_def, block, dataset: DataSet):
+
+        self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
+
+        # add input data
+        block.evaluated[-1] = dataset.augmentation_pipeline
+
+        # go solve
+        for node_index in block.active_nodes:
+            if node_index < 0:
+                # do nothing. at input node
+                continue
+            elif node_index >= block_def.main_count:
+                # do nothing NOW. at output node. we'll come back to grab output after this loop
+                continue
+            else:
+                # main node. this is where we evaluate
+                function = block[node_index]["ftn"]
+
+                inputs = []
+                node_input_indices = block[node_index]["inputs"]
+                for node_input_index in node_input_indices:
+                    inputs.append(block.evaluated[node_input_index])
+
+                args = []
+                node_arg_indices = block[node_index]["args"]
+                for node_arg_index in node_arg_indices:
+                    args.append(block.args[node_arg_index].value)
+
+                # print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
+                '''try:
+                    self.evaluated[node_index] = function(*inputs, *args)
+                except Exception as e:
+                    print(e)
+                    self.dead = True
+                    break'''
+
+        output = block.evaluated[block.genome[block_def.main_count]]  # modified augmentor
+        dataset.augmentation_pipeline = output
+        return dataset
+
+
 class BlockPreprocessEvaluate(EvaluateDefinition):
 
-    def evaluate(self, block, training_datapair, validation_datapair=None):
-        pass
+    def evaluate(self, block_def, block, dataset: DataSet):
+        self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
+
+        # add input data
+        block.evaluated[-1] = dataset.preprocess_pipeline
+
+        # go solve
+        for node_index in block.active_nodes:
+            if node_index < 0:
+                # do nothing. at input node
+                continue
+            elif node_index >= block_def.main_count:
+                # do nothing NOW. at output node. we'll come back to grab output after this loop
+                continue
+            else:
+                # main node. this is where we evaluate
+                function = block[node_index]["ftn"]
+
+                inputs = []
+                node_input_indices = block[node_index]["inputs"]
+                for node_input_index in node_input_indices:
+                    inputs.append(block.evaluated[node_input_index])
+
+                args = []
+                node_arg_indices = block[node_index]["args"]
+                for node_arg_index in node_arg_indices:
+                    args.append(block.args[node_arg_index].value)
+
+                # print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
+                '''try:
+                    self.evaluated[node_index] = function(*inputs, *args)
+                except Exception as e:
+                    print(e)
+                    self.dead = True
+                    break'''
+
+        output = block.evaluated[block.genome[block_def.main_count]]  # modified augmentor
+        dataset.preprocess_pipeline = output
+        return dataset
 
 
 class BlockTensorFlowEvaluate(BlockStandardEvaluate):

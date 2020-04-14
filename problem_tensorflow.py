@@ -3,7 +3,7 @@ import numpy as np
 
 # scripts
 from problem_interface import ProblemDefinition
-from factory import Factory, TensorFactory
+from factory import TensorFactory
 from operators import TFOps
 from arguments import NoArgs
 from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
@@ -17,7 +17,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score as accuracy
 
 # This is a temporary import. We are forcing normalization since we only have one training block
-from augmentation_operators import Normalize
+from pipeline_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
