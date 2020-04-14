@@ -195,14 +195,14 @@ class BlockMPIStandardEvaluate(EvaluateDefinition):
         pass
 
 
-class BlockAugmentationEvaluate(EvaluateDefinition):
+class BlockAugmentationEvaluate(BlockStandardEvaluate):
 
     def evaluate(self, block_def, block, dataset: DataSet):
 
         self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
 
         # add input data
-        block.evaluated[-1] = dataset.augmentation_pipeline
+        block.evaluated[-1] = dataset.augmentation_pipeline  # assign input to last index
 
         # go solve
         for node_index in block.active_nodes:
@@ -240,7 +240,7 @@ class BlockAugmentationEvaluate(EvaluateDefinition):
         return dataset
 
 
-class BlockPreprocessEvaluate(EvaluateDefinition):
+class BlockPreprocessEvaluate(BlockStandardEvaluate):
 
     def evaluate(self, block_def, block, dataset: DataSet):
         self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks

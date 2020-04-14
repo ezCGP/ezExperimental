@@ -10,12 +10,14 @@ from evaluate import IndividualStandardEvaluate, BlockAugmentationEvaluate, Bloc
     BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
+from shape import ShapeAugmentor, ShapeTensor
 
 from database.ezDataLoader import load_CIFAR10
 
 # Fitness imports
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score as accuracy
+from shape import ShapeTensor
 
 
 class Problem(ProblemDefinition):
@@ -23,12 +25,11 @@ class Problem(ProblemDefinition):
         population_size = 8
         number_universe = 1
         factory = TensorFactory
-        factory_instance = factory()
         mpi = True
         super().__init__(population_size, number_universe, factory, mpi)
 
         augmentation_block_def = self.construct_block_def(nickname="augmentation_block",
-                                                          shape_def=factory_instance.build_shape(),
+                                                          shape_def=ShapeAugmentor,
                                                           operator_def=AugmentationOps,
                                                           argument_def=NoArgs,
                                                           evaluate_def=BlockAugmentationEvaluate,
@@ -36,7 +37,7 @@ class Problem(ProblemDefinition):
                                                           mate_def=BlockNoMate)
 
         preprocessing_block_def = self.construct_block_def(nickname="preprocessing_block",
-                                                           shape_def=factory_instance.build_shape(),
+                                                           shape_def=ShapeAugmentor,
                                                            operator_def=PreprocessingOps,
                                                            argument_def=NoArgs,
                                                            evaluate_def=BlockPreprocessEvaluate,
@@ -44,7 +45,7 @@ class Problem(ProblemDefinition):
                                                            mate_def=BlockNoMate)
 
         tensorflow_block_def = self.construct_block_def(nickname="tensorflow_block",
-                                                        shape_def=factory_instance.build_shape(),
+                                                        shape_def=ShapeTensor,
                                                         operator_def=TFOps,
                                                         argument_def=NoArgs,
                                                         evaluate_def=BlockTensorFlowEvaluate,

@@ -84,7 +84,7 @@ class TFOps(OperatorDefinition):
 class AugmentationOps(OperatorDefinition):
 
     def __init__(self):
-        modules = ['augmentation_operator']
+        modules = ['pipeline_operators']
         weight_dict = {pipeline_operators.rotate: 1}
 
         operators, weights = build_weights(weight_dict)
@@ -97,7 +97,7 @@ class AugmentationOps(OperatorDefinition):
 class PreprocessingOps(OperatorDefinition):
 
     def __init__(self):
-        modules = ['preprocessing_operator']
+        modules = ['pipeline_operators']
         weight_dict = {pipeline_operators.normalize: 1}
 
         operators, weights = build_weights(weight_dict)

@@ -52,8 +52,8 @@ def rotate(p, probability=.5, max_left_rotation=5, max_right_rotation=10):
     return p
 
 
-operDict["rotate"] = {"inputs": [Augmentor.Pipeline],
-                      "outputs": Augmentor.Pipeline,
+operDict[rotate] = {"inputs": [Augmentor.Pipeline],
+                      "output": Augmentor.Pipeline,
                       "args": []
                       }
 
@@ -64,6 +64,6 @@ def normalize(p: Augmentor.Pipeline, probability=.5):
 
 
 operDict[normalize] = {"inputs": [Augmentor.Pipeline],
-                       "outputs": Augmentor.Pipeline,
+                       "output": Augmentor.Pipeline,
                        "args": []
                        }
