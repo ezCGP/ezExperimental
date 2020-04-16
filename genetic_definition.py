@@ -200,6 +200,7 @@ class BlockDefinition():
                 arg_index = [None]*len(arg_dtypes)
                 for ith_arg, arg_dtype in enumerate(arg_dtypes):
                     poss_arg_index = self.get_random_arg(req_dtype=arg_dtype)
+                    arg_index[ith_arg] = poss_arg_index
                 if None in arg_index:
                     # failed to fill it in; try another ftn
                     continue

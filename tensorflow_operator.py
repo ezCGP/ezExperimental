@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from argument_types import argPow2 #
+from argument_types import argPow2, activation
 operDict = {}
 
 def input_layer(input_tensor):
@@ -20,7 +20,7 @@ def dense_layer(input_tensor, num_units=128, activation="relu"):
 
 operDict[dense_layer] = {"inputs": [tf.keras.layers],
                       "output": tf.keras.layers,
-                      "args": ["argPow2"]
+                      "args": [argPow2, activation]
                     }
 
 

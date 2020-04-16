@@ -24,7 +24,7 @@ def mut_uniform(value):
     else:
         low = value*.85
         high = value * 1.15
-        return np.uniform(low,high)
+        return np.random.uniform(low,high)
 
 def mut_normal(value):
     if value == 0:
