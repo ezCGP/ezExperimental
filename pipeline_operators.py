@@ -1,6 +1,7 @@
 import Augmentor
 from Augmentor.Operations import Operation
 import numpy as np
+from argument_types import argFloat
 
 operDict = {}
 
@@ -54,7 +55,7 @@ def rotate(p, probability=.5, max_left_rotation=5, max_right_rotation=10):
 
 operDict[rotate] = {"inputs": [Augmentor.Pipeline],
                       "output": Augmentor.Pipeline,
-                      "args": []
+                      "args": [argFloat]
                       }
 
 
@@ -67,3 +68,4 @@ operDict[normalize] = {"inputs": [Augmentor.Pipeline],
                        "output": Augmentor.Pipeline,
                        "args": []
                        }
+

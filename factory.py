@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 from genetic_material import IndividualMaterial, BlockMaterial
 from genetic_definition import IndividualDefinition, BlockDefinition
 from population import PopulationDefinition, SubPopulationDefinition
-from shape import ShapeA, ShapeTensor, ShapeImage
+from shape import ShapeA, ShapeTensor
 
 
 class Factory():

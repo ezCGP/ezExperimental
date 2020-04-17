@@ -18,14 +18,14 @@ class OperatorDefinition():
     '''
     words
     '''
-
     def __init__(self,
-                 operators: List,
-                 weights: List,
-                 modules: List):
+                operators: List,
+                weights: List,
+                modules: List):
         self.build_operDict(modules)
         self.operators = operators
         self.weights = weights
+
 
     def build_operDict(self, modules: List):
         '''
@@ -72,7 +72,7 @@ class TFOps(OperatorDefinition):
         modules = ['tensorflow_operator']
         weight_dict = {tensorflow_operator.dense_layer: 1,
                        tensorflow_operator.activation: 1
-                       }  # TODO fix this. See issue
+                        } #  TODO fix this. See issue
 
         operators, weights = build_weights(weight_dict)
         OperatorDefinition.__init__(self,

@@ -5,7 +5,7 @@ import numpy as np
 from problem_interface import ProblemDefinition
 from factory import TensorFactory
 from operators import TFOps, PreprocessingOps, AugmentationOps
-from arguments import NoArgs
+from arguments import TFArgs, NoArgs, AugmentArgs
 from evaluate import IndividualStandardEvaluate, BlockAugmentationEvaluate, BlockPreprocessEvaluate, \
     BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
@@ -31,7 +31,7 @@ class Problem(ProblemDefinition):
         augmentation_block_def = self.construct_block_def(nickname="augmentation_block",
                                                           shape_def=ShapeAugmentor,
                                                           operator_def=AugmentationOps,
-                                                          argument_def=NoArgs,
+                                                          argument_def=AugmentArgs,
                                                           evaluate_def=BlockAugmentationEvaluate,
                                                           mutate_def=BlockMutateA,
                                                           mate_def=BlockNoMate)
@@ -39,7 +39,7 @@ class Problem(ProblemDefinition):
         preprocessing_block_def = self.construct_block_def(nickname="preprocessing_block",
                                                            shape_def=ShapeAugmentor,
                                                            operator_def=PreprocessingOps,
-                                                           argument_def=NoArgs,
+                                                           argument_def=NoArgs, # no arguments for preprocessing
                                                            evaluate_def=BlockPreprocessEvaluate,
                                                            mutate_def=BlockMutateA,
                                                            mate_def=BlockNoMate)
