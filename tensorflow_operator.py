@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from argument_types import argPow2, activation
+from argument_types import argPow2, activation, argFilterSize, argPoolHeight, argPoolWidth
 operDict = {}
 
 def input_layer(input_tensor):
@@ -34,7 +34,7 @@ def conv_layer(input_tensor, filters=64, kernel_size=3, activation = tf.nn.relu)
 
 operDict[conv_layer] = {"inputs": [tf.keras.layers],
                       "output": tf.keras.layers,
-                      "args": ["argPow2", "avgFilterSize"]
+                      "args": [argPow2, argFilterSize, activation]
                     }
 
 #Functions - need max_pool_layer
@@ -67,7 +67,7 @@ def fractional_max_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
     return tf.nn.fractional_max_pool(input_tensor, pooling_ratio, pseudo_random, overlapping)[0]
 
 operDict[fractional_max_pool] = {"inputs": [tf.Tensor],
-                            "args": ['argPoolHeight', 'argPoolWidth'],
+                            "args": [argPoolHeight, argPoolWidth],
                             "outputs": tf.Tensor,
                             "name": 'fractional_max_pool'}
 
@@ -81,7 +81,7 @@ def fractional_avg_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
     return tf.nn.fractional_avg_pool(input_tensor, pooling_ratio, pseudo_random, overlapping)[0]
 
 operDict[fractional_avg_pool] = {"inputs": [tf.Tensor],
-                            "args": ['argPoolHeight', 'argPoolWidth'],
+                            "args": [argPoolHeight, argPoolWidth],
                             "outputs": tf.Tensor,
                             "name": 'fractional_avg_pool'}
 
