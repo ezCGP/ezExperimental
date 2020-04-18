@@ -10,9 +10,11 @@ from typing import List
 # scripts
 from utils import build_weights
 import simple_numpy
-import tensorflow_operator
+#import tensorflow_operator
+#somehow importing^ before pipeline_operators made a difference with tf.keras.layers.__name__
+#so moved the import after
 import pipeline_operators
-
+import tensorflow_operator
 
 class OperatorDefinition():
     '''
