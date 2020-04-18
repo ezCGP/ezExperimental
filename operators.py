@@ -11,7 +11,7 @@ from typing import List
 from utils import build_weights
 import simple_numpy
 import tensorflow_operator
-
+import pipeline_operators
 
 
 class OperatorDefinition():
@@ -42,22 +42,24 @@ class SymbRegressionNoArgs(OperatorDefinition):
     '''
     words
     '''
+
     def __init__(self):
         modules = ['simple_numpy']
         weight_dict = {simple_numpy.add_ff2f: 1,
-                    simple_numpy.add_fa2a: 1,
-                    simple_numpy.add_aa2a: 1,
-                    simple_numpy.sub_ff2f: 1,
-                    simple_numpy.sub_fa2a: 1,
-                    simple_numpy.sub_aa2a: 1,
-                    simple_numpy.mul_ff2f: 1,
-                    simple_numpy.mul_fa2a: 1,
-                    simple_numpy.mul_aa2a: 1}
+                       simple_numpy.add_fa2a: 1,
+                       simple_numpy.add_aa2a: 1,
+                       simple_numpy.sub_ff2f: 1,
+                       simple_numpy.sub_fa2a: 1,
+                       simple_numpy.sub_aa2a: 1,
+                       simple_numpy.mul_ff2f: 1,
+                       simple_numpy.mul_fa2a: 1,
+                       simple_numpy.mul_aa2a: 1}
         operators, weights = build_weights(weight_dict)
         OperatorDefinition.__init__(self,
                                     operators,
                                     weights,
                                     modules)
+
 
 class TFOps(OperatorDefinition):
     '''
@@ -65,6 +67,7 @@ class TFOps(OperatorDefinition):
     This class is used by problem_interface in order to run
     an evolution. Specifies tensorflow primitives.
     '''
+
     def __init__(self):
         modules = ['tensorflow_operator']
         weight_dict = {tensorflow_operator.dense_layer: 1,
@@ -76,6 +79,33 @@ class TFOps(OperatorDefinition):
                                     operators,
                                     weights,
                                     modules)
+
+
+class AugmentationOps(OperatorDefinition):
+
+    def __init__(self):
+        modules = ['pipeline_operators']
+        weight_dict = {pipeline_operators.rotate: 1}
+
+        operators, weights = build_weights(weight_dict)
+        OperatorDefinition.__init__(self,
+                                    operators,
+                                    weights,
+                                    modules)
+
+
+class PreprocessingOps(OperatorDefinition):
+
+    def __init__(self):
+        modules = ['pipeline_operators']
+        weight_dict = {pipeline_operators.normalize: 1}
+
+        operators, weights = build_weights(weight_dict)
+        OperatorDefinition.__init__(self,
+                                    operators,
+                                    weights,
+                                    modules)
+
 
 '''
 class SymbRegressionWithArgs(OperatorDefinition):

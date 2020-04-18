@@ -4,6 +4,7 @@ Where we specify which datatype to include
 
 # packages
 from typing import List
+import numpy as np
 
 # scripts
 import argument_types
@@ -31,7 +32,7 @@ class ArgumentDefinition():
         only works before __init__ called
         '''
         args, weights = build_weights(weight_dict)
-
+        return args, weights
 
     def fill_args(self):
         '''
@@ -40,7 +41,7 @@ class ArgumentDefinition():
         start_point = 0
         end_point = 0
         self.arg_types = [None]*self.arg_count
-        for arg_type, arg_weights in zip(self.arg_alltypes, self.arg_weights):
+        for arg_type, arg_weight in zip(self.arg_alltypes, self.arg_weights):
             end_point += int(arg_weight*self.arg_count)
             for arg_index in range(start_point, end_point):
                 self.arg_types[arg_index] = arg_type
@@ -50,7 +51,7 @@ class ArgumentDefinition():
             sorted_byweight = np.argsort(self.arg_weights)[::-1] # sort then reverse
             for i, arg_index in enumerate(range(end_point, self.arg_count)):
                 arg_class = self.arg_alltypes[sorted_byweight[i]]
-                self.arg_types[arg_indx] = arg_class
+                self.arg_types[arg_index] = arg_class
         else:
             pass
 
@@ -58,7 +59,7 @@ class ArgumentDefinition():
 
 class Size50(ArgumentDefinition):
     def __init__(self):
-        arg_count = 50
+        arg_count = 50  # creates 50 random initializations
         arg_dict = {argument_types.argInt: 1,
                     argument_types.argPow2: 1}
         args, weights = ArgumentDefinition.get_arg_weights(arg_dict)
@@ -67,7 +68,18 @@ class Size50(ArgumentDefinition):
                                     args,
                                     weights)
 
+class TFArgs(ArgumentDefinition):
+    def __init__(self):
+        arg_count = 50  # creates 50 random initializations
+        arg_dict = {argument_types.argInt: 1,
+                    argument_types.argPow2: 1,
+                    argument_types.activation: 1}
 
+        args, weights = ArgumentDefinition.get_arg_weights(arg_dict)
+        ArgumentDefinition.__init__(self,
+                                    arg_count,
+                                    args,
+                                    weights)
 class NoArgs(ArgumentDefinition):
     def __init__(self):
         arg_count = 0 
@@ -75,3 +87,14 @@ class NoArgs(ArgumentDefinition):
                                     arg_count,
                                     [],
                                     [])
+
+class AugmentArgs(ArgumentDefinition):
+    def __init__(self):
+        arg_count = 50  # creates 50 random initializations
+        arg_dict = {argument_types.argFloat: 1}
+
+        args, weights = ArgumentDefinition.get_arg_weights(arg_dict)
+        ArgumentDefinition.__init__(self,
+                                    arg_count,
+                                    args,
+                                    weights)

@@ -4,7 +4,7 @@
 factory class will be tasked with building/__init__ all the other classes.
 that way we can wrap other debugging + logging items around the init of each class
 '''
-
+# Seems like
 # packages
 import os
 import sys
@@ -52,11 +52,11 @@ class Factory():
         block_def.evaluate_def.reset_evaluation(block) # or move...ya prob move to evaluate TODO
         return block
 
-    def build_shape(self):
+    def build_shape(self): # REMOVE THIS METHOD!?
         return ShapeA
 
 
 
-class TensorFactory(Factory):
+class TensorFactory(Factory): # REMOVE THIS CLASS?
     def build_shape(self):
         return ShapeTensor
