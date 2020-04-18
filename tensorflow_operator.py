@@ -66,9 +66,9 @@ def fractional_max_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
     # returns a tuple of Tensor objects (output, row_pooling_sequence, col_pooling_sequence
     return tf.nn.fractional_max_pool(input_tensor, pooling_ratio, pseudo_random, overlapping)[0]
 
-operDict[fractional_max_pool] = {"inputs": [tf.Tensor],
+operDict[fractional_max_pool] = {"inputs": [tf.keras.layers],
                             "args": [argPoolHeight, argPoolWidth],
-                            "outputs": tf.Tensor,
+                            "output": tf.keras.layers,
                             "name": 'fractional_max_pool'}
 
 def fractional_avg_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
@@ -80,9 +80,9 @@ def fractional_avg_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
     # returns a tuple of Tensor objects (output, row_pooling_sequence, col_pooling_sequence)
     return tf.nn.fractional_avg_pool(input_tensor, pooling_ratio, pseudo_random, overlapping)[0]
 
-operDict[fractional_avg_pool] = {"inputs": [tf.Tensor],
+operDict[fractional_avg_pool] = {"inputs": [tf.keras.layers],
                             "args": [argPoolHeight, argPoolWidth],
-                            "outputs": tf.Tensor,
+                            "output": tf.keras.layers,
                             "name": 'fractional_avg_pool'}
 
 def activation(input):

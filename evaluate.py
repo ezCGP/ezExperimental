@@ -128,8 +128,16 @@ class IndividualStandardEvaluate(EvaluateDefinition):
         for block_index, block in enumerate(indiv.blocks):
             block_def = indiv_def[block_index]
             if block.need_evaluate:
-                data = indiv_def[block_index].evaluate(block_def, block, data)
-
+                try:
+                    data = indiv_def[block_index].evaluate(block_def, block, data)
+                    block.evaluated = [None] * len(block.genome)  # reset
+                except Exception as e:
+                    print("individual failed to evaluate at block_index", block_index)
+                    print(e)
+                    block.evaluated = [None] * len(block.genome)
+                    traceback.print_exc()
+                    indiv.output = None
+                    return
         indiv.output = data #TODO figure this out
 
     def reset_evaluation(self):
@@ -304,7 +312,9 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             num_classes = 10
 
             # add input data
-            inputshape = dataset.x_train[0].shape
+            sample, _ = dataset.next_batch_train(1)
+
+            inputshape = sample[0].shape
             input_ = tf.keras.layers.Input(inputshape)  # dataset.augmentor_pipeline
             block.evaluated[-1] = input_
 
@@ -353,15 +363,18 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
 
             #  extract parameters from dataset object
-            batch_size = 64
-            n_epochs = 1  # TODO set variable n_epochs changeable from problem
+            batch_size = 1
+            mini_batches = len(dataset.x_train) // batch_size
+            mini_batches = 1
+            n_epochs = 20  # TODO set variable n_epochs changeable from problem
+            n_epochs = 1
             model.compile(loss = "categorical_crossentropy", optimzer = opt)
             for i in range(n_epochs):
-                batchX, batchY = dataset.next_batch_train(batch_size)
-                loss = model.train_on_batch(batchX , batchY)
-                print("epoch %d completed" %i, "loss = ", loss)
+                for b in range(mini_batches):
+                    batchX, batchY = dataset.next_batch_train(batch_size)
+                    loss = model.train_on_batch(batchX , batchY)
+                print("epoch %d completed" % i, "loss = ", loss)
             x_val_norm, _ = dataset.preprocess_test_data()
-            self.reset_evaluation(block)  # do this to avoid deepcopy issues in mutate
             return model.predict(x_val_norm)
 
         #dataset -> augmentationBlock-> return dataset -> preprocessingBlock -> return dataset -> BlockTensorFlowEvaluate -> return outputs of val set

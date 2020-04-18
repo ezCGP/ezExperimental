@@ -133,12 +133,15 @@ class BlockDefinition():
         '''
         choices = np.array(self.operators)
         weights = np.array(self.operator_weights)
-        
+
         for val in exclude:
             #note: have to delete from weights first because we use choices to get right index
             weights = np.delete(weights, np.where(choices==val))
             choices = np.delete(choices, np.where(choices==val))
-        
+
+        if len(choices) == 0:
+            return None
+
         # now check the output dtypes match
         if req_dtype is not None:
             delete = []

@@ -84,7 +84,8 @@ def mutate_single_ftn(indiv, block_index: int, block_def):
         current_ftn = block[node_index]["ftn"]
         req_output_dtype = block_def.operator_dict[current_ftn]["output"]
         new_ftn = block_def.get_random_ftn(req_dtype=req_output_dtype, exclude=[current_ftn])
-
+        if new_ftn == None: # was not able to mutate
+            continue
         # make sure input_dtypes match
         req_input_dtypes = block_def.operator_dict[new_ftn]["inputs"]
         new_inputs = [None]*len(req_input_dtypes)

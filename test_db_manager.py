@@ -7,7 +7,7 @@ import time
 from database.ezDataLoader import load_CIFAR10
 
 from tensorflow.keras.applications.resnet_v2 import ResNet152V2
-
+from tensorflow.keras.applications.resnet50 import preprocess_input
 
 # Create your new operation by inheriting from the Operation superclass:
 class Normalize(Operation):
@@ -49,6 +49,22 @@ class ResNet(Operation):
                                 input_shape=images[0].shape)
         return self.resModel.predict(images)
 
+class ResNetNorm(Operation):
+    """
+    Purpose of function is to add an Augmentor primtive that is literally the output of a fully trained neural network
+    """
+
+    # Here you can accept as many custom parameters as required:
+    def __init__(self):
+        # Call the superclass's constructor (meaning you must
+        # supply a probability value):
+        Operation.__init__(self, probability=1)
+
+    # Your class must implement the perform_operation method:
+    def perform_operation(self, images):
+        # Return the image so that it can further processed in the pipeline:
+        images = np.asarray(images)
+        return preprocess_input(images)
 
 dataset = load_CIFAR10(.95, .05) # .8 training percent, .2 validation
 
@@ -58,6 +74,7 @@ dataset.augmentation_pipeline.skew(.5)  # shew 50% of images
 
 
 #  Preprocessing Step
+dataset.preprocess_pipeline.add_operation(ResNetNorm())
 dataset.preprocess_pipeline.add_operation(Normalize())
 dataset.preprocess_pipeline.add_operation(ResNet())  # trained neural network can be thought of as advanced feature extraction
 

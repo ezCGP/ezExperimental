@@ -86,7 +86,7 @@ class Universe():
         '''
         self.generation = 0
         self.evaluate_score_population(problem)
-        self.population_selection()
+        self.population_selection() # front is printed here
         while not self.converged:
             self.generation += 1
             self.evolve_population(problem)

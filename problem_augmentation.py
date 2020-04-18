@@ -10,7 +10,7 @@ from evaluate import IndividualStandardEvaluate, BlockAugmentationEvaluate, Bloc
     BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
-from shape import ShapeAugmentor, ShapeTensor
+from shape import ShapeAugmentor, ShapeTensor, ShapePreprocessing
 
 from database.ezDataLoader import load_CIFAR10
 
@@ -22,10 +22,10 @@ from shape import ShapeTensor
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 8
+        population_size = 4 # has to be at least 4
         number_universe = 1
         factory = TensorFactory
-        mpi = True
+        mpi = False
         super().__init__(population_size, number_universe, factory, mpi)
 
         augmentation_block_def = self.construct_block_def(nickname="augmentation_block",
@@ -37,9 +37,9 @@ class Problem(ProblemDefinition):
                                                           mate_def=BlockNoMate)
 
         preprocessing_block_def = self.construct_block_def(nickname="preprocessing_block",
-                                                           shape_def=ShapeAugmentor,
+                                                           shape_def=ShapePreprocessing,
                                                            operator_def=PreprocessingOps,
-                                                           argument_def=NoArgs, # no arguments for preprocessing
+                                                           argument_def=NoArgs,  # no arguments for preprocessing
                                                            evaluate_def=BlockPreprocessEvaluate,
                                                            mutate_def=BlockMutateA,
                                                            mate_def=BlockNoMate)
@@ -47,7 +47,7 @@ class Problem(ProblemDefinition):
         tensorflow_block_def = self.construct_block_def(nickname="tensorflow_block",
                                                         shape_def=ShapeTensor,
                                                         operator_def=TFOps,
-                                                        argument_def=NoArgs,
+                                                        argument_def=TFArgs,
                                                         evaluate_def=BlockTensorFlowEvaluate,
                                                         mutate_def=BlockMutateA,
                                                         mate_def=BlockNoMate)
@@ -75,6 +75,9 @@ class Problem(ProblemDefinition):
         :param indiv: individual which contains references to output of training
         :return: None
         """
+        if not np.any(indiv.output):
+            indiv.fitness.values = (1, 1)  # means that individual errored out
+            return
         dataset = self.data
         _, actual = dataset.preprocess_test_data()
         actual = np.argmax(actual, axis=1)

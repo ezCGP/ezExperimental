@@ -71,7 +71,9 @@ class TFOps(OperatorDefinition):
     def __init__(self):
         modules = ['tensorflow_operator']
         weight_dict = {tensorflow_operator.dense_layer: 1,
-                       tensorflow_operator.activation: 1
+                       tensorflow_operator.conv_layer: 1,
+                       tensorflow_operator.fractional_max_pool: 1,
+
                         } #  TODO fix this. See issue
 
         operators, weights = build_weights(weight_dict)
@@ -85,7 +87,9 @@ class AugmentationOps(OperatorDefinition):
 
     def __init__(self):
         modules = ['pipeline_operators']
-        weight_dict = {pipeline_operators.rotate: 1}
+        weight_dict = {pipeline_operators.rotate: 1,
+                       pipeline_operators.horizontal_flip: 1,
+                       pipeline_operators.random_crop: 1}
 
         operators, weights = build_weights(weight_dict)
         OperatorDefinition.__init__(self,
@@ -98,7 +102,9 @@ class PreprocessingOps(OperatorDefinition):
 
     def __init__(self):
         modules = ['pipeline_operators']
-        weight_dict = {pipeline_operators.normalize: 1}
+        weight_dict = {pipeline_operators.normalize: 1,
+                       pipeline_operators.res_net_norm:1,
+                       pipeline_operators.res_net: 1}
 
         operators, weights = build_weights(weight_dict)
         OperatorDefinition.__init__(self,
