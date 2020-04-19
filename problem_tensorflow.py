@@ -6,7 +6,7 @@ from problem_interface import ProblemDefinition
 from factory import Factory, TensorFactory
 from operators import TFOps
 from arguments import NoArgs
-from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
+from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate, BlockTensorFlowGPUEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
 
@@ -24,18 +24,19 @@ from augmentation_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
-        population_size = 8
+        population_size = 64
         number_universe = 1
         factory = TensorFactory
         factory_instance = factory()
         mpi = True
+        gpu = True
         super().__init__(population_size, number_universe, factory, mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
                                              shape_def = factory_instance.build_shape(),
                                              operator_def =  TFOps,
                                              argument_def = NoArgs,
-                                             evaluate_def = BlockTensorFlowEvaluate,
+                                             evaluate_def = BlockTensorFlowGPUEvaluate if gpu else BlockTensorFlowEvaluate,
                                              mutate_def = BlockMutateA,
                                              mate_def = BlockNoMate)
 
@@ -88,7 +89,7 @@ class Problem(ProblemDefinition):
         :param universe:
         :return:
         """
-        GENERATION_LIMIT = 1
+        GENERATION_LIMIT = 5
         SCORE_MIN = 1e-1
 
         print("\n\n\n\n\n", universe.generation, np.min(np.array(universe.fitness_scores)))

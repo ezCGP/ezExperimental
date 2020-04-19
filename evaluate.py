@@ -184,8 +184,84 @@ class BlockPreprocessEvaluate(EvaluateDefinition):
     def evaluate(self, block, training_datapair, validation_datapair=None):
         pass
 
-
 class BlockTensorFlowEvaluate(BlockStandardEvaluate):
+    """main -> universe -> individual evaluate -> tensorblock evaluate"""
+    def evaluate(self, block_def, block, dataset: DataSet):
+        """
+        block_def : specifies specific params of the block.
+        block: contains graph structure
+        dataset: contains training dataset.
+
+        returns: the predicted labels of the the validation set contained in dataset
+        """
+        import os
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+        self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
+        num_classes = 10
+
+        # add input data
+        inputshape = dataset.x_train[0].shape
+        input_ = tf.keras.layers.Input(inputshape)
+        block.evaluated[-1] = input_
+
+        # go solve
+        for node_index in block.active_nodes:
+            if node_index < 0:
+                # do nothing. at input node
+                continue
+            elif node_index >= block_def.main_count:
+                # do nothing NOW. at output node. we'll come back to grab output after this loop
+                continue
+            else:
+                # main node. this is where we evaluate
+                function = block[node_index]["ftn"]
+
+                inputs = []
+                node_input_indices = block[node_index]["inputs"]
+                for node_input_index in node_input_indices:
+                    inputs.append(block.evaluated[node_input_index])
+
+                args = []
+                node_arg_indices = block[node_index]["args"]
+                for node_arg_index in node_arg_indices:
+                    args.append(block.args[node_arg_index].value)
+
+                # print(function, inputs, args)
+                block.evaluated[node_index] = function(*inputs, *args)
+                '''try:
+                    self.evaluated[node_index] = function(*inputs, *args)
+                except Exception as e:
+                    print(e)
+                    self.dead = True
+                    break'''
+
+        output = block.evaluated[block.genome[block_def.main_count]]
+
+        #  flatten the output node and perform a softmax
+        flat_out = tf.keras.layers.Flatten()(output)
+        logits = tf.keras.layers.Dense(num_classes)(flat_out)
+        softmax = tf.keras.activations.softmax(logits, axis= 1)
+
+        #  construct model from "dummy" input and softmax output
+        model = tf.keras.Model(input_, softmax, name="dummy")
+        opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+        #init = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
+        model.compile(loss = "categorical_crossentropy", optimzer = opt)
+
+        #  extract parameters from dataset object
+        batch_size = 1
+        n_epochs = 1  # TODO set variable n_epochs changeable from problem
+        model.compile(loss = "categorical_crossentropy", optimzer = opt)
+        for i in range(n_epochs):
+            batchX, batchY = dataset.next_batch_train(batch_size)
+            loss = model.train_on_batch(batchX , batchY)
+            print("epoch %d completed" %i, "loss = ", loss)
+        x_val_norm, _ = dataset.preprocess_test_data()
+        self.reset_evaluation(block)  # do this to avoid deepcopy issues in mutate
+        return model.predict(x_val_norm)
+
+class BlockTensorFlowGPUEvaluate(BlockStandardEvaluate):
     """main -> universe -> individual evaluate -> tensorblock evaluate"""
     def evaluate(self, block_def, block, dataset: DataSet):
         """
@@ -197,7 +273,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
         """
 
         gpus = tf.config.experimental.list_physical_devices('GPU')
-        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
+        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 1)])
 
         with tf.device(':'.join(gpus[0].name.split(':')[1:])):
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
