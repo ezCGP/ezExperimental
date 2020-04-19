@@ -4,7 +4,7 @@ import numpy as np
 from argument_types import argFloat
 from tensorflow.keras.applications.resnet_v2 import ResNet152V2
 from tensorflow.keras.applications.resnet50 import preprocess_input
-
+import tensorflow as tf
 operDict = {}
 
 class Normalize(Operation):
@@ -43,7 +43,9 @@ class ResNet(Operation):
         images = np.asarray(images)
         resModel = ResNet152V2(include_top=False, weights='imagenet', input_tensor=None,
                                     input_shape=images[0].shape)
-        return resModel.predict(images)[:, 0, 0, :]
+        out = resModel.predict(images)
+        tf.keras.backend.clear_session()
+        return out
 
 class ResNetNorm(Operation):
     """
@@ -60,8 +62,9 @@ class ResNetNorm(Operation):
     def perform_operation(self, images):
         # Return the image so that it can further processed in the pipeline:
         images = np.asarray(images)
-        return preprocess_input(images)
-
+        out =  preprocess_input(images)
+        tf.keras.backend.clear_session()
+        return out
 """Augmentation Primtives"""
 
 def rotate(p, probability=.5, max_left_rotation=10, max_right_rotation=10):

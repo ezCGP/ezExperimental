@@ -52,7 +52,7 @@ class ShapeTensor(ShapeMetaDefinition):
         """
         TODO: Consider where to appropriately placing main_count
         """
-        main_count = 20
+        main_count = 25
         ShapeMetaDefinition.__init__(self,
                                      input_dtypes,
                                      output_dtypes,
@@ -78,7 +78,7 @@ class ShapePreprocessing(ShapeMetaDefinition):
         """
         TODO: Consider where to appropriately placing main_count
         """
-        main_count = 3
+        main_count = 5
         ShapeMetaDefinition.__init__(self,
                                      input_dtypes,
                                      output_dtypes,

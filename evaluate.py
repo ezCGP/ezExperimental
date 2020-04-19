@@ -18,7 +18,8 @@ import traceback
 import tensorflow as tf
 from ezData.data_pair import DataPair
 from ezData.dataset import DataSet
-
+from sklearn.metrics import accuracy_score as accuracy
+import numpy as np
 # scripts
 
 
@@ -306,9 +307,9 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
         """
 
         gpus = tf.config.experimental.list_physical_devices('GPU')
-#        tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
+      #  tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 3)])
 
- #       with tf.device(':'.join(gpus[0].name.split(':')[1:])):
+       # with tf.device(':'.join(gpus[0].name.split(':')[1:])):
         if 1 == 1:
             self.reset_evaluation(block)  # TODO most of this code can be abstracted out as a global to all blocks
             num_classes = 10
@@ -362,21 +363,39 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
             model = tf.keras.Model(input_, softmax, name="dummy")
             opt = tf.keras.optimizers.Adam(learning_rate=0.001)
             #init = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
-            model.compile(loss = "categorical_crossentropy", optimzer = opt)
+            model.compile(loss = "categorical_crossentropy", optimizer = opt)
 
-            #  extract parameters from dataset object
-            batch_size = 1
+            #  TODO should extract training parameters from dataset object
+            batch_size = 256
+            n_epochs = 15  # TODO set variable n_epochs changeable from problem
             mini_batches = len(dataset.x_train) // batch_size
-            mini_batches = 1
-            n_epochs = 20  # TODO set variable n_epochs changeable from problem
-            n_epochs = 1
-            model.compile(loss = "categorical_crossentropy", optimzer = opt)
+
+            # validation params for early stopping
+            x_val_norm, _ = dataset.preprocess_test_data()
+            valCheckTime = 5  # every 5 epochs get validation accuracy
+            old_validation_accuracy = 0
+            predictions = None # stores validation predictions
             for i in range(n_epochs):
+                training_loss = 0
+
                 for b in range(mini_batches):
                     batchX, batchY = dataset.next_batch_train(batch_size)
-                    loss = model.train_on_batch(batchX , batchY)
-                print("epoch %d completed" % i, "loss = ", loss)
-            x_val_norm, _ = dataset.preprocess_test_data()
+                    training_loss+= model.train_on_batch(batchX , batchY)
+
+                if i % valCheckTime == 0:  # early stopping
+                        predictions = model.predict(x_val_norm)
+
+                        validation_accuracy =  accuracy(np.argmax(dataset.y_test, axis = 1), 
+                            np.argmax(predictions, axis=1))
+
+                        if validation_accuracy < old_validation_accuracy:
+                            print("old Val Accuracy", old_validation_accuracy, "was better than current val accuracy", validation_accuracy)
+                            tf.keras.backend.clear_session()
+                            return predictions
+                        print("validation accuracy", validation_accuracy)
+                        old_validation_accuracy = validation_accuracy
+                print("Epoch", i, "training loss", training_loss)
+
             tf.keras.backend.clear_session()
             return model.predict(x_val_norm)
 
