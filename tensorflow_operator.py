@@ -58,7 +58,7 @@ operDict[conv_layer] = {"inputs": [tf.keras.layers],
 
 # TODO: see error PACE, start here
 def fractional_max_pool(input_tensor, pool_height = 2.0, pool_width = 2.0):
-    if input_tensor.shape[1].value == 1:
+    if input_tensor.shape[1] == 1:
         return input_tensor
     pooling_ratio = [1.0, pool_height, pool_width, 1.0]      # see args.py for mutation limits
     pseudo_random = True        # true random underfits when combined with data augmentation and/or dropout

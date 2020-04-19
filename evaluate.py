@@ -245,6 +245,7 @@ class BlockAugmentationEvaluate(BlockStandardEvaluate):
 
         output = block.evaluated[block.genome[block_def.main_count]]  # modified augmentor
         dataset.augmentation_pipeline = output
+        tf.keras.backend.clear_session()
         return dataset
 
 
@@ -289,6 +290,7 @@ class BlockPreprocessEvaluate(BlockStandardEvaluate):
 
         output = block.evaluated[block.genome[block_def.main_count]]  # modified augmentor
         dataset.preprocess_pipeline = output
+        tf.keras.backend.clear_session()
         return dataset
 
 
@@ -375,6 +377,7 @@ class BlockTensorFlowEvaluate(BlockStandardEvaluate):
                     loss = model.train_on_batch(batchX , batchY)
                 print("epoch %d completed" % i, "loss = ", loss)
             x_val_norm, _ = dataset.preprocess_test_data()
+            tf.keras.backend.clear_session()
             return model.predict(x_val_norm)
 
         #dataset -> augmentationBlock-> return dataset -> preprocessingBlock -> return dataset -> BlockTensorFlowEvaluate -> return outputs of val set

@@ -76,7 +76,7 @@ class Visualizer:
             count += 1
 
         loss, f1 = individual.fitness.values
-        self.csv_rows.append(f"{self.individual_num}END,\"Fitness: ({1 - loss},{f1})\",,{'#ffe6cc'},\"{prev_output}\"")
+        self.csv_rows.append(f"{self.individual_num}END,\"Fitness: ({loss},{f1})\",,{'#ffe6cc'},\"{prev_output}\"")
 
         self.append_csv()
 
@@ -111,13 +111,14 @@ if __name__ == "__main__":
     # load file and path
     #filename, file_extension = os.path.splitext(sys.argv[1])
     filename = 'vis_out'
-    path = 'outputs/problem_symbolicRegression/20200418-143513/univ0' + '/' + filename
+    path = "outputs/problem_augmentation/20200418-220423/univ0/" + filename
+    #path = 'outputs/problem_symbolicRegression/20200418-143513/univ0' + '/' + filename
     #print(path)
     print('Saving visualized csv to {}'.format(path + '.csv'))
 
     # create visualizer object and load population
     vis = Visualizer(path)
-    population = np.load('outputs/problem_symbolicRegression/20200418-143513/univ0/gen10_pop.npy', allow_pickle=True)
+    population = np.load('outputs/problem_augmentation/20200418-220423/univ0/gen1_pop.npy', allow_pickle=True)
     print(len(population))
     for individual in population:
         vis.add_to_csv(individual, from_npy=True)
