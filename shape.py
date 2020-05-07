@@ -7,6 +7,7 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
+from Augmentor import Pipeline
 
 # scripts
 
@@ -38,7 +39,7 @@ class ShapeA(ShapeMetaDefinition):
     def __init__(self):
         input_dtypes = [np.float64, np.ndarray]  # Should we declare this higher up the chain. Should it be block specific
         output_dtypes = [np.ndarray]
-        main_count = 25
+        main_count = 20
         ShapeMetaDefinition.__init__(self,
                                 input_dtypes,
                                 output_dtypes,
@@ -56,3 +57,31 @@ class ShapeTensor(ShapeMetaDefinition):
                                      input_dtypes,
                                      output_dtypes,
                                      main_count)
+
+class ShapeAugmentor(ShapeMetaDefinition):
+    def __init__(self):
+        input_dtypes = [Pipeline]  # Should we declare this higher up the chain. Should it be block specific
+        output_dtypes = [Pipeline]
+        """
+        TODO: Consider where to appropriately placing main_count
+        """
+        main_count = 20
+        ShapeMetaDefinition.__init__(self,
+                                     input_dtypes,
+                                     output_dtypes,
+                                     main_count)
+
+class ShapePreprocessing(ShapeMetaDefinition):
+    def __init__(self):
+        input_dtypes = [Pipeline]  # Should we declare this higher up the chain. Should it be block specific
+        output_dtypes = [Pipeline]
+        """
+        TODO: Consider where to appropriately placing main_count
+        """
+        main_count = 5
+        ShapeMetaDefinition.__init__(self,
+                                     input_dtypes,
+                                     output_dtypes,
+                                     main_count)
+
+

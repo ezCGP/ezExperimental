@@ -3,12 +3,13 @@ import numpy as np
 
 # scripts
 from problem_interface import ProblemDefinition
-from factory import Factory, TensorFactory
+from factory import TensorFactory
 from operators import TFOps
 from arguments import TFArgs
 from evaluate import IndividualStandardEvaluate, BlockTensorFlowEvaluate
 from mutate import InidividualMutateA, BlockMutateA
 from mate import IndividualMateA, BlockNoMate
+from shape import ShapeTensor
 
 from database.ezDataLoader import load_CIFAR10
 
@@ -17,7 +18,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score as accuracy
 
 # This is a temporary import. We are forcing normalization since we only have one training block
-from augmentation_operators import Normalize
+from pipeline_operators import Normalize
 
 class Problem(ProblemDefinition):
     def __init__(self):
@@ -29,7 +30,7 @@ class Problem(ProblemDefinition):
         super().__init__(population_size, number_universe, factory, mpi)
 
         block_def = self.construct_block_def(nickname = "main_block",
-                                             shape_def = factory_instance.build_shape(), # should set genome_main count here
+                                             shape_def = ShapeTensor, # should set genome_main count here
                                              operator_def =  TFOps,
                                              argument_def = TFArgs,
                                              evaluate_def = BlockTensorFlowEvaluate,
@@ -37,9 +38,9 @@ class Problem(ProblemDefinition):
                                              mate_def = BlockNoMate)
 
         self.construct_individual_def(block_defs = [block_def],
-                                    mutate_def = InidividualMutateA,
-                                    mate_def = IndividualMateA,
-                                    evaluate_def = IndividualStandardEvaluate)
+                                    mutate_def=InidividualMutateA,
+                                    mate_def=IndividualMateA,
+                                    evaluate_def=IndividualStandardEvaluate)
 
         # where to put this?
         self.construct_dataset()
@@ -56,9 +57,8 @@ class Problem(ProblemDefinition):
         """
         dataset = load_CIFAR10(.8, .2)
 
-        # force normalization
-        dataset.train_pipeline.add_operation(Normalize())
-        dataset.test_pipeline.add_operation(Normalize())
+        # force normalization  # will now apply to both pipelines
+        dataset.preprocess_pipeline.add_operation(Normalize())
 
         self.data = dataset
 

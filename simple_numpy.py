@@ -2,6 +2,7 @@
 import numpy as np
 operDict = {}
 
+# TODO: refactor operDict to take strings as keys, not function pointers
 
 def add_ff2f(a,b):
     return np.add(a,b)

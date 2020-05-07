@@ -73,7 +73,10 @@ class TFArgs(ArgumentDefinition):
         arg_count = 50  # creates 50 random initializations
         arg_dict = {argument_types.argInt: 1,
                     argument_types.argPow2: 1,
-                    argument_types.activation: 1}
+                    argument_types.activation: 1,
+                    argument_types.argFilterSize: 1,
+                    argument_types.argPoolHeight: 1,
+                    argument_types.argPoolWidth: 1}
 
         args, weights = ArgumentDefinition.get_arg_weights(arg_dict)
         ArgumentDefinition.__init__(self,
@@ -87,3 +90,14 @@ class NoArgs(ArgumentDefinition):
                                     arg_count,
                                     [],
                                     [])
+
+class AugmentArgs(ArgumentDefinition):
+    def __init__(self):
+        arg_count = 50  # creates 50 random initializations
+        arg_dict = {argument_types.argFloat: 1}
+
+        args, weights = ArgumentDefinition.get_arg_weights(arg_dict)
+        ArgumentDefinition.__init__(self,
+                                    arg_count,
+                                    args,
+                                    weights)

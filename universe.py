@@ -6,7 +6,8 @@ words
 import os
 import sys
 from abc import ABC, abstractmethod
-
+import numpy as np
+from tempfile import TemporaryFile
 
 # scripts
 from genetic_material import IndividualMaterial
@@ -16,6 +17,7 @@ from genetic_material import IndividualMaterial
 from problem_interface import ProblemDefinition
 from population import PopulationDefinition
 from typing import List
+
 
 from mpi4py import MPI
 
@@ -86,13 +88,34 @@ class Universe():
         '''
         self.generation = 0
         self.evaluate_score_population(problem)
-        self.population_selection()
+        self.population_selection() # front is printed here
         while not self.converged:
             self.generation += 1
             self.evolve_population(problem)
             self.evaluate_score_population(problem)
             self.population_selection()
             self.check_convergence(problem)
+            self.save_results()
+
+    def save_results(self):
+
+        try:
+            file_pop = open('{}/gen{}_pop.npy'.format(self.output_folder, self.generation))
+            np.save(file_pop, self.population)
+
+        except IOError: # create a new universe's individuals
+            print('Tried to load previous generations, but no files found.')
+
+            newpath = r'{}/'.format(self.output_folder)
+
+            if not os.path.exists(newpath):
+                os.makedirs(newpath)
+
+            print(newpath)
+            file_pop = '{}/gen{}_pop.npy'.format(newpath, self.generation)
+            np.save(file_pop, self.population.population)
+
+
 
 
 # TODO: no input params for run()
@@ -128,7 +151,7 @@ class MPIUniverse(Universe):
         # np.random.seed()
 
         # DatasetObject pass it into evaluation
-
+        print("running")
         self.population = self.factory.build_population(problem.indiv_def, int(problem.pop_size / size))
         self.evaluate_score_population(problem)
         self.population_selection()
@@ -160,7 +183,10 @@ class MPIUniverse(Universe):
         self.save_results()
 
     def save_results(self):
-        pass
+        file_pop = '{}/gen{}_pop.npy'.format(self.output_folder, self.generation)
+        np.save(file_pop, self.population)
+        np.save(file_generation, self.generation)
+        print("hi")
 
     def population_selection_mpi(self, sub_pops: List[PopulationDefinition]):
         """

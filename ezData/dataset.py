@@ -3,6 +3,7 @@ Created by Michael Jurado and Yuhang Li.
 This class will be how ezCGP transfers data between blocks.
 """
 
+from PIL import Image
 import Augmentor
 import numpy as np
 
@@ -20,10 +21,27 @@ class DataSet():
         self.y_train = y_train
         self.x_test = x_test
         self.y_test = y_test
-        self.train_pipeline = Augmentor.Pipeline()
-        self.test_pipeline = Augmentor.Pipeline()
+        self.augmentation_pipeline = Augmentor.Pipeline()
+        self.preprocess_pipeline = Augmentor.Pipeline()
         self.batch_size = None  # batch_size
         self.generator = None  # training_generator
+
+
+    def _transform_preprocess(self, images):
+        """
+        purpose of function is to mirror Augmentor.Pipelines torch_transform method for preprocessing
+
+         - Recall that preprocessing methods should have a probability of 1, which is why this function errors if
+           any primtives have a probability less than 1
+
+          - We don't call torch_transform here it is inefficient
+        images: all images (like x_train)
+        """
+        for operation in self.preprocess_pipeline.operations: # assure that all probabilities are set to 1
+            assert operation.probability == 1
+        for operation in self.preprocess_pipeline.operations:
+            images = operation.perform_operation(images)
+        return images
 
     def clear_data(self):
         """
@@ -31,39 +49,48 @@ class DataSet():
         """
         self.batch_size = None
         self.generator = None
-        self.train_pipeline = Augmentor.Pipeline()
-        self.test_pipeline = Augmentor.Pipeline()
+        self.augmentation_pipeline = Augmentor.Pipeline()
+        self.preprocess_pipeline = Augmentor.Pipeline()
 
     def next_batch_train(self, batch_size):
         """
-        :param batch_size: mini-batch size
-        :return: numpy array of training samples generated from the current training pipeline
+        Applies augmentation and preprocessing pipeline to a batch of data
+            - Use this in evaluator methods to train a network
+        batch_size: amount of data to sample for x_train, and y_train
+        returns: x_batch, y_batch -> len(x_batch) = batch_size
         """
-        self.make_generator(batch_size)
-        return next(self.generator)
+        # augmentation pipeline
+        images = np.random.choice(np.arange(len(self.x_train)),  batch_size)
+        x_batch = self.x_train[images]
+        x_batch = [Image.fromarray(img) for img in x_batch]
+        y_batch = self.y_train[images]
+        augmentation = self.augmentation_pipeline.torch_transform() # applies augmentation according to probabilities
+        x_batch = np.array([np.asarray(augmentation(x)) for x in x_batch])
+
+        # preprocess pipeline
+        return np.asarray(self._transform_preprocess(x_batch)), y_batch
 
     def make_generator(self, batch_size):
         """
+        DEPRECATED because it does not apply the preprocessing pipeline correctly
         Makes a keras data_generator from the train pipeline
         param batch_size: mini-batch size
         :return None
         """
         if batch_size != self.batch_size:
-            self.generator = self.train_pipeline.keras_generator_from_array(self.x_train.astype(np.uint8),
+            self.generator = self.augmentation_pipeline.keras_generator_from_array(self.x_train.astype(np.uint8),
                                                                             self.y_train, batch_size, scaled=False)
 
     def preprocess_train_data(self):
         """
-        Runs the augmentation and preprocessing pipeline and returns augmented and preprocessed train data
+        Runs the reprocessing pipeline and returns  preprocessed train data
         :return: preprocessed train data (unbatched)
         """
-        preprocessor = self.train_pipeline.torch_transform()
-        return np.array([np.asarray(preprocessor(x)) for x in self.x_train]), self.y_train
+        return np.asarray(self._transform_preprocess(self.x_train)), self.y_train
 
     def preprocess_test_data(self):
         """
         Runs the preprocessing pipeline and returns preprocessed test data
         :return: preprocessed test data (unbatched)
         """
-        preprocessor = self.test_pipeline.torch_transform()
-        return np.array([np.asarray(preprocessor(x)) for x in self.x_test]), self.y_test
+        return np.asarray(self._transform_preprocess(self.x_test)), self.y_test
