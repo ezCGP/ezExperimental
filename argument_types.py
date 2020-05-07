@@ -18,6 +18,7 @@ from copy import copy
     Consider limiting them to be strictly positive or non-negative
 '''
 
+
 def mut_uniform(value):
     if value == 0:
         return r.uniform(0,5)
@@ -25,6 +26,7 @@ def mut_uniform(value):
         low = value*.85
         high = value * 1.15
         return np.random.uniform(low,high)
+
 
 def mut_normal(value):
     if value == 0:
@@ -58,7 +60,10 @@ def mut_normal(value):
     The argument skeleton is filled by sampling from this list so even if
     an Arg Class is defined but not added to the list, it will not be used.
     '''
+
+
 arguments = []
+
 
 class argInt():
 
@@ -90,7 +95,10 @@ class argInt():
         else:
             pass
         self.value = int(self.value)
+
+
 arguments.append(argInt)
+
 
 class argPow2():
 
@@ -110,7 +118,10 @@ class argPow2():
 
     def __repr__(self):
         return str(self)
+
+
 arguments.append(argPow2)
+
 
 class argFilterSize(object):
 
@@ -156,7 +167,9 @@ class argPoolHeight(object):
     def __repr__(self):
         return str(self)
 
+
 arguments.append(argPoolHeight)
+
 
 class argPoolWidth(object):
 
@@ -177,7 +190,9 @@ class argPoolWidth(object):
     def __repr__(self):
         return str(self)
 
+
 arguments.append(argPoolWidth)
+
 
 class activation(object):
 
@@ -222,3 +237,4 @@ class argFloat():
     def __repr__(self):
         return str(self)
 arguments.append(argFloat)
+
