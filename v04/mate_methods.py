@@ -19,7 +19,7 @@ from copy import deepcopy
 
 # scripts
 
-def whole_block(parent1, parent2, block_index: int):
+def whole_block(parent1, parent2, block_index: int, block_def):
     child1 = deepcopy(parent1)
     child1[block_index] = deepcopy(parent2[block_index])
 
@@ -28,7 +28,7 @@ def whole_block(parent1, parent2, block_index: int):
 
     return [child1, child2]
 
-def partial_block(parent1, parent2, block_index: int):
+def partial_block(parent1, parent2, block_index: int, block_def):
     child1 = deepcopy(parent1)
     child2 = deepcopy(parent2)
     pass
