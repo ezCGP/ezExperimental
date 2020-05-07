@@ -130,5 +130,9 @@ class WithThis(ThisDef):
 
     def helloplus():
         print("hello")
-        import scipy as sci
+        import scipy as sci #not accessible nor imported 
         WithThis.hi()
+
+from test2 import func
+print("imported")
+func(1,2) # failed to run since np not imported in test2

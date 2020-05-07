@@ -36,8 +36,6 @@ class OperatorDefinition():
             self.operator_dict.update(_.operDict)
             del _
 
-    # TODO have a method to import in all modules and set weight_dict for all methods to 1
-
 
 class SymbRegressionNoArgs(OperatorDefinition):
     '''
